@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
@@ -11,7 +10,6 @@ import java.util.List;
  * Контроллер для {@link User}
  */
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/users")
 @Slf4j
 public class UserController extends AbstractController<User> {
