@@ -2,14 +2,18 @@ package ru.yandex.practicum.filmorate.model;
 
 import java.time.LocalDate;
 import javax.validation.constraints.*;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Пользователь.
  */
 @Data
-@Builder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@NoArgsConstructor
 public class User extends AbstractEntity {
 
     @Email(message = "Электронная почта не соответствует формату")

@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import java.util.List;
+import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import javax.validation.Valid;
-import java.util.List;
 
 /**
  * Контроллер для {@link User}
@@ -30,7 +30,6 @@ public class UserController extends AbstractController<User> {
      */
     @PostMapping
     public User create(@RequestBody @Valid User user) {
-
         log.debug("Добавление пользователя {}", user);
 
         return super.create(user);
@@ -47,9 +46,7 @@ public class UserController extends AbstractController<User> {
     }
 
     @Override
-    protected void validate(User user) {
-        super.validate(user);
-
+    public void validate(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }

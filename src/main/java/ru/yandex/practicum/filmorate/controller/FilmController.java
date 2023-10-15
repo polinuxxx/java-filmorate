@@ -29,7 +29,6 @@ public class FilmController extends AbstractController<Film> {
      */
     @PostMapping
     public Film create(@RequestBody @Valid Film film) {
-
         log.debug("Добавление фильма {}", film);
 
         return super.create(film);
@@ -43,5 +42,9 @@ public class FilmController extends AbstractController<Film> {
         log.debug("Редактирование фильма {}", film);
 
         return super.update(film);
+    }
+
+    @Override
+    public void validate(Film item) {
     }
 }
