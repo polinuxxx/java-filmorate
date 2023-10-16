@@ -62,7 +62,7 @@ public abstract class AbstractStorage<T extends AbstractEntity> implements Stora
 
     protected void validate(T item) {
         if (item.getId() == null) {
-            throw new ValidationException("Идентификатор сущности = null");
+            throw new ValidationException(String.format("Идентификатор сущности %s = null", item));
         }
     }
 }

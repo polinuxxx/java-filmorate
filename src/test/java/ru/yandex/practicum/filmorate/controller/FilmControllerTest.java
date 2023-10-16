@@ -27,9 +27,6 @@ class FilmControllerTest {
 
     private static final String PATH = "/films";
 
-    @Autowired
-    private FilmController filmController;
-
     @Test
     void createPositive() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post(PATH)

@@ -15,14 +15,14 @@ import ru.yandex.practicum.filmorate.service.UserService;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService service;
+    private final UserService userService;
 
     /**
      * Получение всех пользователей.
      */
     @GetMapping
     public List<User> getAll() {
-        return service.getAll();
+        return userService.getAll();
     }
 
     /**
@@ -30,7 +30,7 @@ public class UserController {
      */
     @GetMapping("/{id}")
     public User getById(@PathVariable Long id) {
-        return service.getById(id);
+        return userService.getById(id);
     }
 
     /**
@@ -38,7 +38,7 @@ public class UserController {
      */
     @PostMapping
     public User create(@RequestBody @Valid User user) {
-        return service.create(user);
+        return userService.create(user);
     }
 
     /**
@@ -46,7 +46,7 @@ public class UserController {
      */
     @PutMapping
     public User update(@RequestBody @Valid User user) {
-        return service.update(user);
+        return userService.update(user);
     }
 
     /**
@@ -54,26 +54,26 @@ public class UserController {
      */
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        service.delete(id);
+        userService.delete(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
-        service.addFriend(id, friendId);
+        userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void deleteFriend(@PathVariable Long id, @PathVariable Long friendId) {
-        service.deleteFriend(id, friendId);
+        userService.deleteFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable Long id) {
-        return service.getFriends(id);
+        return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
-        return service.getCommonFriends(id, otherId);
+        return userService.getCommonFriends(id, otherId);
     }
 }

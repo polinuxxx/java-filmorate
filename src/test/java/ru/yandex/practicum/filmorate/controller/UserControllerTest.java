@@ -27,9 +27,6 @@ class UserControllerTest {
 
     private static final String PATH = "/users";
 
-    @Autowired
-    private UserController userController;
-
     @Test
     void createPositive() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post(PATH)
