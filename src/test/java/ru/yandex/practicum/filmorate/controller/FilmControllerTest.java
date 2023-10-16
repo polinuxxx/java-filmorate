@@ -3,8 +3,6 @@ package ru.yandex.practicum.filmorate.controller;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.time.LocalDate;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,7 +13,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.ResourceUtils;
-import ru.yandex.practicum.filmorate.model.Film;
 
 /**
  * Тесты для {@link FilmController}.
@@ -30,12 +27,8 @@ class FilmControllerTest {
 
     private static final String PATH = "/films";
 
+    @Autowired
     private FilmController filmController;
-
-    @BeforeEach
-    void setUp() {
-        filmController = new FilmController();
-    }
 
     @Test
     void createPositive() throws Exception {
@@ -51,7 +44,8 @@ class FilmControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post(PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/film/film-release-date-less-than-28-december-1895.json")))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andReturn().getResolvedException().getMessage().equals("Дата релиза не может быть раньше 28 декабря 1895 года");
     }
 
     @Test
@@ -59,7 +53,8 @@ class FilmControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post(PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/film/film-name-empty.json")))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andReturn().getResolvedException().getMessage().equals("Название не может быть пустым");
     }
 
     @Test
@@ -67,7 +62,8 @@ class FilmControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post(PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/film/film-description-more-200-symbols.json")))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andReturn().getResolvedException().getMessage().equals("Описание не может превышать 200 символов");
     }
 
     @Test
@@ -75,19 +71,8 @@ class FilmControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post(PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/film/film-duration-negative.json")))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
-    }
-
-    @Test
-    void validate() {
-        Film film = Film.builder()
-                .name("Oppenheimer")
-                .description("Epic biographical thriller film written and directed by Christopher Nolan")
-                .releaseDate(LocalDate.of(2023, 7, 11))
-                .duration(153)
-                .build();
-
-        filmController.validate(film);
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andReturn().getResolvedException().getMessage().equals("Продолжительность должна быть положительной");
     }
 
     private String getContentFromFile(String fileName) {

@@ -7,6 +7,8 @@ import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Фильм.
@@ -28,6 +30,8 @@ public class Film extends AbstractEntity {
 
     @Positive(message = "Продолжительность должна быть положительной")
     private Integer duration;
+
+    private Set<Long> likes = new HashSet<>();
 
     @AssertFalse(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
     public boolean isReleaseDateLessMinPossibleDate() {

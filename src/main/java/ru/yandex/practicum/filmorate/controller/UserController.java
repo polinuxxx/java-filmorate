@@ -2,27 +2,35 @@ package ru.yandex.practicum.filmorate.controller;
 
 import java.util.List;
 import javax.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 /**
  * Контроллер для {@link User}
  */
 @RestController
 @RequestMapping("/users")
-@Slf4j
-public class UserController extends AbstractController<User> {
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService service;
 
     /**
      * Получение всех пользователей.
      */
     @GetMapping
-    @Override
     public List<User> getAll() {
-        log.debug("Получение всех пользователей, текущее количество: {}", items.size());
+        return service.getAll();
+    }
 
-        return super.getAll();
+    /**
+     * Получение пользователя по идентификатору.
+     */
+    @GetMapping("/{id}")
+    public User getById(@PathVariable Long id) {
+        return service.getById(id);
     }
 
     /**
@@ -30,9 +38,7 @@ public class UserController extends AbstractController<User> {
      */
     @PostMapping
     public User create(@RequestBody @Valid User user) {
-        log.debug("Добавление пользователя {}", user);
-
-        return super.create(user);
+        return service.create(user);
     }
 
     /**
@@ -40,15 +46,34 @@ public class UserController extends AbstractController<User> {
      */
     @PutMapping
     public User update(@RequestBody @Valid User user) {
-        log.debug("Редактирование пользователя {}", user);
-
-        return super.update(user);
+        return service.update(user);
     }
 
-    @Override
-    public void validate(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+    /**
+     * Удаление пользователя.
+     */
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        service.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        service.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable Long id) {
+        return service.getFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
+        return service.getCommonFriends(id, otherId);
     }
 }

@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.controller;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,7 +13,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.ResourceUtils;
-import ru.yandex.practicum.filmorate.model.User;
 
 /**
  * Тесты для {@link UserController}.
@@ -29,12 +27,8 @@ class UserControllerTest {
 
     private static final String PATH = "/users";
 
+    @Autowired
     private UserController userController;
-
-    @BeforeEach
-    void setUp() {
-        userController = new UserController();
-    }
 
     @Test
     void createPositive() throws Exception {
@@ -50,7 +44,8 @@ class UserControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post(PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/user/user-birthday-future.json")))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andReturn().getResolvedException().getMessage().equals("Дата рождения не может быть в будущем");
     }
 
     @Test
@@ -58,7 +53,8 @@ class UserControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post(PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/user/user-email-empty.json")))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andReturn().getResolvedException().getMessage().equals("Электронная почта не может быть пустой");
     }
 
     @Test
@@ -66,7 +62,8 @@ class UserControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post(PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/user/user-email-incorrect-format.json")))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andReturn().getResolvedException().getMessage().equals("Электронная почта не соответствует формату");
     }
 
     @Test
@@ -74,7 +71,8 @@ class UserControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post(PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/user/user-login-empty.json")))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andReturn().getResolvedException().getMessage().equals("Логин не может быть пустым");
     }
 
     @Test
@@ -82,18 +80,8 @@ class UserControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post(PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/user/user-login-with-spaces.json")))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
-    }
-
-    @Test
-    void validate() {
-        User user = User.builder()
-                .email("polina.kazichkina@yandex.ru")
-                .login("polinuxxx")
-                .name("Полина")
-                .build();
-
-        userController.validate(user);
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andReturn().getResolvedException().getMessage().equals("Логин не может содержать пробелы");
     }
 
     private String getContentFromFile(String fileName) {
