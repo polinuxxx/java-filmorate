@@ -1,28 +1,26 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.AbstractEntity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
+import ru.yandex.practicum.filmorate.model.AbstractEntity;
 
 /**
  * Базовый контроллер.
  */
 public abstract class AbstractController<T extends AbstractEntity> {
 
-    private int counter = 0;
+    private long counter;
 
-    protected final Map<Integer, T> items = new HashMap<>();
+    protected final Map<Long, T> items = new HashMap<>();
 
     public List<T> getAll() {
-
         return new ArrayList<>(items.values());
     }
 
     public T create(T item) {
-
         item.setId(++counter);
 
         validate(item);
@@ -33,15 +31,14 @@ public abstract class AbstractController<T extends AbstractEntity> {
 
     public T update(T item) {
 
+        if (!items.containsKey(item.getId())) {
+            throw new EntityNotFoundException(String.format("Сущность %s не найдена", item));
+        }
         validate(item);
         items.put(item.getId(), item);
 
         return item;
     }
 
-    protected void validate(T item) {
-        if (items.containsValue(item)) {
-            throw new ValidationException(item.getClass().getName() + " уже создан");
-        }
-    }
+    public abstract void validate(T item);
 }

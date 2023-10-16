@@ -1,15 +1,22 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Фильм.
  */
 @Data
-@Builder(toBuilder = true)
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@NoArgsConstructor
 public class Film extends AbstractEntity {
     private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
@@ -23,6 +30,8 @@ public class Film extends AbstractEntity {
 
     @Positive(message = "Продолжительность должна быть положительной")
     private Integer duration;
+
+    private Set<Long> likes = new HashSet<>();
 
     @AssertFalse(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
     public boolean isReleaseDateLessMinPossibleDate() {
