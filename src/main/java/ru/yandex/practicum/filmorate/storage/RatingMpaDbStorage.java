@@ -13,7 +13,7 @@ import ru.yandex.practicum.filmorate.model.RatingMpa;
  */
 @Component
 @RequiredArgsConstructor
-public class RatingMpaDbStorage implements RatingMpaStorage{
+public class RatingMpaDbStorage implements RatingMpaStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
