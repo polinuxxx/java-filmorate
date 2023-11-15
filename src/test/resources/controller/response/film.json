@@ -3,5 +3,7 @@
   "name": "Oppenheimer",
   "description": "Epic biographical thriller film written and directed by Christopher Nolan",
   "releaseDate": "2023-07-19",
-  "duration": 180
+  "duration": 180,
+  "mpa": { "id": 3, "name": "PG-13", "description": "Детям до 13 лет просмотр нежелателен"},
+  "genres": []
 }

@@ -10,6 +10,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -41,6 +43,7 @@ public class Film extends AbstractEntity {
     @NotNull(message = "Рейтинг MPA не может быть пустой")
     private RatingMpa mpa;
 
+    @JsonIgnore
     @AssertFalse(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
     public boolean isReleaseDateLessMinPossibleDate() {
         return releaseDate != null && releaseDate.isBefore(MIN_RELEASE_DATE);

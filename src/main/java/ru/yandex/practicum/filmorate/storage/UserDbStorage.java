@@ -42,7 +42,7 @@ public class UserDbStorage implements UserStorage {
 
         item.setId(simpleJdbcInsert.executeAndReturnKey(item.toMap()).longValue());
 
-        return item;
+        return getById(item.getId());
     }
 
     @Override
@@ -56,7 +56,7 @@ public class UserDbStorage implements UserStorage {
                 item.getBirthday(),
                 item.getId());
 
-        return item;
+        return getById(item.getId());
     }
 
     @Override
