@@ -9,20 +9,20 @@ ER-diagram for java-filmorate project.
 ### getting film likes
 ```sql
 SELECT COUNT(user_id)
-  FROM like
+  FROM likes
   WHERE film_id = :id;
 ```
 ### getting user friends
 ```sql
 SELECT friend_id
-  FROM user_friend
-  WHERE user_id = :id and is_confirmed = true;
+  FROM friends
+  WHERE user_id = :id;
 ```
 ### getting most popular films
 ```sql
 SELECT film_id,
        COUNT(user_id) AS likes
-  FROM like
+  FROM likes
   GROUP BY film_id
   ORDER BY likes DESC
   LIMIT :count;
