@@ -66,7 +66,7 @@ public class FilmService {
             filmGenreStorage.addGenresToFilm(film.getId(), film.getGenres());
         }
 
-        return film;
+        return createdFilm;
     }
 
     @Transactional
