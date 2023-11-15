@@ -60,13 +60,12 @@ public class FilmService {
         validate(film);
 
         Film createdFilm = filmStorage.create(film);
-        film.setId(createdFilm.getId());
 
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            filmGenreStorage.addGenresToFilm(film.getId(), film.getGenres());
+            filmGenreStorage.addGenresToFilm(createdFilm.getId(), film.getGenres());
         }
 
-        return createdFilm;
+        return getById(createdFilm.getId());
     }
 
     @Transactional
