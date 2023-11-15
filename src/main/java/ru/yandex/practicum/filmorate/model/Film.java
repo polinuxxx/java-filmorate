@@ -1,14 +1,19 @@
 package ru.yandex.practicum.filmorate.model;
 
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import javax.validation.constraints.AssertFalse;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import javax.validation.constraints.*;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Фильм.
@@ -31,10 +36,25 @@ public class Film extends AbstractEntity {
     @Positive(message = "Продолжительность должна быть положительной")
     private Integer duration;
 
-    private Set<Long> likes = new HashSet<>();
+    private Set<Genre> genres = new HashSet<>();
+
+    @NotNull(message = "Рейтинг MPA не может быть пустой")
+    private RatingMpa mpa;
 
     @AssertFalse(message = "Дата релиза не может быть раньше 28 декабря 1895 года")
     public boolean isReleaseDateLessMinPossibleDate() {
         return releaseDate != null && releaseDate.isBefore(MIN_RELEASE_DATE);
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("id", getId());
+        values.put("name", name);
+        values.put("description", description);
+        values.put("release_date", releaseDate);
+        values.put("duration_min", duration);
+        values.put("rating_mpa_id", mpa.getId());
+
+        return values;
     }
 }

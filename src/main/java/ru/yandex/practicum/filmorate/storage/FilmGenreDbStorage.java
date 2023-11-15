@@ -1,0 +1,38 @@
+package ru.yandex.practicum.filmorate.storage;
+
+import java.util.Set;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Genre;
+
+/**
+ * DAO для жанров фильмов.
+ */
+@Component
+@RequiredArgsConstructor
+public class FilmGenreDbStorage {
+
+    private final JdbcTemplate jdbcTemplate;
+
+    public void addGenreToFilm(Long filmId, Long genreId) {
+        jdbcTemplate.update("insert into film_genres (film_id, genre_id) values (?, ?)",
+                filmId, genreId);
+    }
+
+    public void addGenresToFilm(Long filmId, Set<Genre> genres) {
+        genres.forEach(genre -> addGenreToFilm(filmId, genre.getId()));
+    }
+
+    public void deleteGenresFromFilm(Long filmId) {
+        jdbcTemplate.update("delete from film_genres where film_id = ?", filmId);
+    }
+
+    public boolean exists(Long filmId, Long genreId) {
+        String sql = "select case when count(film_id) > 0 then true else false end " +
+                "from film_genres where film_id = ? and genre_id = ?";
+        Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, filmId, genreId);
+
+        return exists != null && exists;
+    }
+}
