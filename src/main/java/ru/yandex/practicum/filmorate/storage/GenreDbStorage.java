@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 /**
@@ -14,12 +15,14 @@ import ru.yandex.practicum.filmorate.model.Genre;
 @Component
 @RequiredArgsConstructor
 public class GenreDbStorage implements GenreStorage {
+    private static final String MAIN_SELECT = "select id, name from genres ";
 
     private final JdbcTemplate jdbcTemplate;
 
     @Override
+    @Transactional(readOnly = true)
     public Genre getById(Long id) {
-        String sql = "select id, name from genres where id = ?";
+        String sql = MAIN_SELECT + "where id = ?";
 
         List<Genre> genres = jdbcTemplate.query(sql, GenreDbStorage::toGenre, id);
 
@@ -27,8 +30,9 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Genre> getAll() {
-        String sql = "select id, name from genres order by id";
+        String sql = MAIN_SELECT + "order by id";
 
         return jdbcTemplate.query(sql, GenreDbStorage::toGenre);
     }
@@ -49,6 +53,7 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean exists(Long id) {
         String sql = "select case when count(id) > 0 then true else false end from genres where id = ?";
 

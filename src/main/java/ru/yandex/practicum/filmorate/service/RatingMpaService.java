@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.RatingMpa;
 import ru.yandex.practicum.filmorate.storage.RatingMpaStorage;
 
@@ -34,27 +33,15 @@ public class RatingMpaService {
     }
 
     public RatingMpa create(RatingMpa ratingMpa) {
-        log.debug("Добавление рейтинга MPA {}", ratingMpa);
-
-        validate(ratingMpa);
-
-        return ratingMpaStorage.create(ratingMpa);
+        throw new UnsupportedOperationException("Операция не разрешена");
     }
 
     public RatingMpa update(RatingMpa ratingMpa) {
-        log.debug("Редактирование рейтинга MPA {}", ratingMpa);
-
-        validate(ratingMpa);
-
-        return ratingMpaStorage.update(ratingMpa);
+        throw new UnsupportedOperationException("Операция не разрешена");
     }
 
     public void delete(Long id) {
-        log.debug("Удаление рейтинга MPA с id = {}", id);
-
-        exists(id);
-
-        ratingMpaStorage.delete(id);
+        throw new UnsupportedOperationException("Операция не разрешена");
     }
 
     public void exists(Long id) {
@@ -63,13 +50,5 @@ public class RatingMpaService {
         if (id != null && !ratingMpaStorage.exists(id)) {
             throw new EntityNotFoundException(String.format("Не найден рейтинг MPA по id = %d.", id));
         }
-    }
-
-    private void validate(RatingMpa ratingMpa) {
-        if (ratingMpa == null) {
-            throw new ValidationException("Передан пустой объект рейтинга MPA.");
-        }
-
-        exists(ratingMpa.getId());
     }
 }
