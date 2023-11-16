@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.model.User;
 
 /**
@@ -15,12 +16,14 @@ import ru.yandex.practicum.filmorate.model.User;
 @Component("userDbStorage")
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
+    private static final String MAIN_SELECT = "select id, name, email, login, birthday from users ";
 
     private final JdbcTemplate jdbcTemplate;
 
     @Override
+    @Transactional(readOnly = true)
     public User getById(Long id) {
-        String sql = "select id, name, email, login, birthday from users where id = ?";
+        String sql = MAIN_SELECT + "where id = ?";
 
         List<User> users = jdbcTemplate.query(sql, UserDbStorage::toUser, id);
 
@@ -28,13 +31,15 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<User> getAll() {
-        String sql = "select id, name, email, login, birthday from users order by id";
+        String sql = MAIN_SELECT + "order by id";
 
         return jdbcTemplate.query(sql, UserDbStorage::toUser);
     }
 
     @Override
+    @Transactional
     public User create(User item) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
@@ -46,6 +51,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
+    @Transactional
     public User update(User item) {
         String sql = "update users set name = ?, login = ?, email = ?, birthday = ? where id = ?";
 
@@ -60,6 +66,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         String sql = "delete from users where id = ?";
 
@@ -67,6 +74,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean exists(Long id) {
         String sql = "select case when count(id) > 0 then true else false end from users where id = ?";
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, id);

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.RatingMpa;
@@ -21,18 +22,20 @@ import ru.yandex.practicum.filmorate.model.RatingMpa;
 @Component("filmDbStorage")
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
+    private static final String MAIN_SELECT = "select films.id, films.name, films.description, films.duration_min, " +
+            "films.release_date, films.rating_mpa_id as mpa_id, mpa.name as mpa_name, mpa.description " +
+            "as mpa_description, genres.id as genre_id, genres.name as genre_name from films " +
+            "left join rating_mpa mpa on films.rating_mpa_id = mpa.id " +
+            "left join film_genres on films.id = film_genres.film_id " +
+            "left join genres on film_genres.genre_id = genres.id ";
 
     private final JdbcTemplate jdbcTemplate;
 
     @Override
+    @Transactional(readOnly = true)
     public Film getById(Long id) {
-        String sql = "select films.id, films.name, films.description, films.duration_min, films.release_date, " +
-                "films.rating_mpa_id as mpa_id, mpa.name as mpa_name, mpa.description as mpa_description, " +
-                "genres.id as genre_id, genres.name as genre_name from films " +
-                "left join rating_mpa mpa on films.rating_mpa_id = mpa.id " +
-                "left join film_genres on films.id = film_genres.film_id " +
-                "left join genres on film_genres.genre_id = genres.id " +
-                "where films.id = ? order by genre_id";
+
+        String sql = MAIN_SELECT + "where films.id = ? order by genre_id";
 
         List<Film> films = getCompleteFilmFromQuery(sql, id);
 
@@ -40,20 +43,15 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Film> getAll() {
-
-        String sql = "select films.id, films.name, films.description, films.duration_min, films.release_date, " +
-                "films.rating_mpa_id as mpa_id, mpa.name as mpa_name, mpa.description as mpa_description, " +
-                "genres.id as genre_id, genres.name as genre_name from films " +
-                "left join rating_mpa mpa on films.rating_mpa_id = mpa.id " +
-                "left join film_genres on films.id = film_genres.film_id " +
-                "left join genres on film_genres.genre_id = genres.id " +
-                "order by films.id";
+        String sql = MAIN_SELECT + "order by films.id";
 
         return getCompleteFilmFromQuery(sql);
     }
 
     @Override
+    @Transactional
     public Film create(Film item) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("films")
@@ -65,6 +63,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    @Transactional
     public Film update(Film item) {
         String sql = "update films set name = ?, description = ?, release_date = ?, duration_min = ?, " +
                 "rating_mpa_id = ? where id = ?";
@@ -81,28 +80,24 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         String sql = "delete from films where id = ?";
 
         jdbcTemplate.update(sql, id);
     }
 
+    @Override
+    @Transactional(readOnly = true)
     public List<Film> getPopular(int count) {
-
-        String sql = "select films.id, films.name, films.description, films.duration_min, films.release_date, " +
-                "films.rating_mpa_id as mpa_id, mpa.name as mpa_name, mpa.description as mpa_description, " +
-                "genres.id as genre_id, genres.name as genre_name from films " +
-                "left join rating_mpa mpa on films.rating_mpa_id = mpa.id " +
-                "left join film_genres on films.id = film_genres.film_id " +
-                "left join genres on film_genres.genre_id = genres.id " +
-                "left join likes on films.id = likes.film_id " +
-                "group by films.id, genre_id " +
-                "order by count(likes.user_id) desc limit ?";
+        String sql = MAIN_SELECT + "left join likes on films.id = likes.film_id " +
+                "group by films.id, genre_id order by count(likes.user_id) desc limit ?";
 
         return getCompleteFilmFromQuery(sql, count);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean exists(Long id) {
         String sql = "select case when count(id) > 0 then true else false end from films where id = ?";
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, id);

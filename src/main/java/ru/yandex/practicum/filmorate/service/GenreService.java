@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
@@ -34,27 +33,15 @@ public class GenreService {
     }
 
     public Genre create(Genre genre) {
-        log.debug("Добавление жанра {}", genre);
-
-        validate(genre);
-
-        return genreStorage.create(genre);
+        throw new UnsupportedOperationException("Операция не разрешена");
     }
 
     public Genre update(Genre genre) {
-        log.debug("Редактирование жанра {}", genre);
-
-        validate(genre);
-
-        return genreStorage.update(genre);
+        throw new UnsupportedOperationException("Операция не разрешена");
     }
 
     public void delete(Long id) {
-        log.debug("Удаление жанра с id = {}", id);
-
-        exists(id);
-
-        genreStorage.delete(id);
+        throw new UnsupportedOperationException("Операция не разрешена");
     }
 
     public void exists(Long id) {
@@ -63,13 +50,5 @@ public class GenreService {
         if (id != null && !genreStorage.exists(id)) {
             throw new EntityNotFoundException(String.format("Не найден жанр по id = %d.", id));
         }
-    }
-
-    private void validate(Genre genre) {
-        if (genre == null) {
-            throw new ValidationException("Передан пустой объект жанра.");
-        }
-
-        exists(genre.getId());
     }
 }
