@@ -40,6 +40,8 @@ public class Film extends AbstractEntity {
 
     private Set<Genre> genres = new HashSet<>();
 
+    private Set<Director> directors = new HashSet<>();
+
     @NotNull(message = "Рейтинг MPA не может быть пустой")
     private RatingMpa mpa;
 

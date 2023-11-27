@@ -43,6 +43,28 @@ create table if not exists FILM_GENRES
             on delete restrict
 );
 
+create table if not exists DIRECTORS
+(
+    ID   BIGINT auto_increment,
+    NAME CHARACTER VARYING(255),
+    constraint DIRECTOR_PK
+        primary key (ID)
+);
+
+create table if not exists FILM_DIRECTORS
+(
+    FILM_ID  BIGINT not null,
+    DIRECTOR_ID BIGINT not null,
+    constraint FILM_DIRECTOR_PK
+        primary key (FILM_ID, DIRECTOR_ID),
+    constraint "film_director_FILM_ID_fk"
+        foreign key (FILM_ID) references FILMS
+            on delete cascade,
+    constraint "film_director_DIRECTOR_ID_fk"
+        foreign key (DIRECTOR_ID) references DIRECTORS
+            on delete restrict
+);
+
 create table if not exists USERS
 (
     ID            BIGINT auto_increment,
