@@ -52,7 +52,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     /**
-     * Получаем список фильмов по списку id фильмов
+     * Получение списка фильмов по списку id фильмов
      * @param ids список id фильмов
      * @return List фильмов.
      */

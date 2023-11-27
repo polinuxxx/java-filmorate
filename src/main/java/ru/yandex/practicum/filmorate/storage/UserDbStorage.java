@@ -51,12 +51,13 @@ public class UserDbStorage implements UserStorage {
     }
 
     /**
-     * Получаем список id рекомендуемых фильмов по id пользователя.
+     * Получение списка id рекомендуемых фильмов по id пользователя.
      *
      * @param id пользователя
      * @return список фильмов
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Long> getRecommendationsFilmIDs(Long id) {
         String sql = "select FILM_ID from LIKES where USER_ID = (select USER_ID as userId from LIKES " +
                 "where FILM_ID in " +
