@@ -34,6 +34,19 @@ public class FilmController {
     }
 
     /**
+     * Поиск фильмов.
+     *
+     * @param query Строка запроса.
+     * @param by тип поиска через запятую. Возможные значения: director, title
+     * @return Списко фильмов.
+     */
+    @GetMapping("/search")
+    public List<Film> get(@RequestParam("query") String query,
+            @RequestParam("by") String by) {
+        return filmService.search(query, by);
+    }
+
+    /**
      * Создание фильма.
      */
     @PostMapping

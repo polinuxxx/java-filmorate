@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +9,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ParamNotExistException;
+import ru.yandex.practicum.filmorate.exception.SearchQueryException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmGenreDbStorage;
@@ -120,6 +124,23 @@ public class FilmService {
         if (id != null && !filmStorage.exists(id)) {
             throw new EntityNotFoundException(String.format("Не найден фильм по id = %d.", id));
         }
+    }
+
+    public List<Film> search(String query, String by) {
+        log.debug("Поиск фильмов");
+
+        if (by == null || by.isEmpty()) {
+            throw new ParamNotExistException("Пустой фильтра поиска. Параметр by должен содержать тип поиска.");
+        }
+
+        if (query == null || query.isEmpty()) {
+            throw new SearchQueryException("Пустая строка для поиска. Параметр query должен быть заполнен.");
+        }
+        String[] params = by.split(",");
+        HashSet<String> stringHashSet = new HashSet<>();
+        Arrays.stream(params).forEach(s -> stringHashSet.add(s));
+
+        return filmStorage.search(query, stringHashSet);
     }
 
     private void validate(Film film) {
