@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -48,6 +49,19 @@ public class FilmDbStorage implements FilmStorage {
         String sql = MAIN_SELECT + "order by films.id";
 
         return getCompleteFilmFromQuery(sql);
+    }
+
+    /**
+     * Получаем список фильмов по списку id фильмов
+     * @param ids список id фильмов
+     * @return List фильмов.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Film> getFilmsFromIdList(List<Long> ids) {
+        String inSql = String.join(",", Collections.nCopies(ids.size(), "?"));
+        String sql = String.format(MAIN_SELECT + " WHERE films.id IN (%s) order by genre_id", inSql);
+        return getCompleteFilmFromQuery(sql, ids.toArray());
     }
 
     @Override

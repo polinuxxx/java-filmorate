@@ -8,5 +8,8 @@ import java.util.List;
  * Интерфейс для хранилища {@link Film}.
  */
 public interface FilmStorage extends Storage<Film> {
+
+    List<Film> getFilmsFromIdList(List<Long> ids);
+
     List<Film> getPopular(int count);
 }

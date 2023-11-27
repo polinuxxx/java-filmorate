@@ -50,6 +50,27 @@ public class UserDbStorage implements UserStorage {
         return getById(item.getId());
     }
 
+    /**
+     * Получаем список id рекомендуемых фильмов по id пользователя.
+     *
+     * @param id пользователя
+     * @return список фильмов
+     */
+    @Override
+    public List<Long> getRecommendationsFilmIDs(Long id) {
+        String sql = "select FILM_ID from LIKES where USER_ID = (select USER_ID as userId from LIKES " +
+                "where FILM_ID in " +
+                "   (select film_id from LIKES where user_id = ?) " +
+                "       and user_id != ? " +
+                "       group by USER_ID " +
+                "       order by count(FILM_ID) DESC " +
+                "       limit 1) " +
+                "and FILM_ID not in (select FILM_ID from LIKES where USER_ID = ?)";
+
+        return jdbcTemplate.queryForList(sql, Long.class, id, id, id);
+
+    }
+
     @Override
     @Transactional
     public User update(User item) {

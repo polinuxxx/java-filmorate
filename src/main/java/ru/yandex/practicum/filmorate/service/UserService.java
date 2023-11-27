@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.FriendDbStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -21,6 +23,9 @@ public class UserService {
 
     @Qualifier("userDbStorage")
     private final UserStorage userStorage;
+
+    @Qualifier("filmDbStorage")
+    private final FilmStorage filmStorage;
 
     private final FriendDbStorage friendStorage;
 
@@ -37,6 +42,21 @@ public class UserService {
         exists(id);
 
         return userStorage.getById(id);
+    }
+
+    /**
+     * Получаем список рекомендуемых фильмов.
+     *
+     * @param id пользователя.
+     * @return список фильмов.
+     */
+    public List<Film> getRecommendationsFilms(Long id) {
+        log.debug("Получение рекомендации для пользователя с id = {}", id);
+
+        exists(id);
+
+        List<Long> recommendations = userStorage.getRecommendationsFilmIDs(id);
+        return filmStorage.getFilmsFromIdList(recommendations);
     }
 
     public User create(User user) {
