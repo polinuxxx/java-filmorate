@@ -138,7 +138,7 @@ public class FilmService {
         }
         String[] params = by.split(",");
         HashSet<String> stringHashSet = new HashSet<>();
-        Arrays.stream(params).forEach(s -> stringHashSet.add(s));
+        stringHashSet.addAll(Arrays.asList(params));
 
         return filmStorage.search(query, stringHashSet);
     }

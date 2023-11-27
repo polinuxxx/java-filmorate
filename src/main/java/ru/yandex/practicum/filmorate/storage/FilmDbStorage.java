@@ -34,7 +34,6 @@ public class FilmDbStorage implements FilmStorage {
             + "left join genres on film_genres.genre_id = genres.id ";
 
     private final JdbcTemplate jdbcTemplate;
-    private final NamedParameterJdbcTemplate parameterJdbcTemplate;
 
 
     @Override
