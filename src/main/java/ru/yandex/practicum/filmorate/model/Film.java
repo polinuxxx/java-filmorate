@@ -12,6 +12,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -40,6 +41,7 @@ public class Film extends AbstractEntity {
 
     private Set<Genre> genres = new HashSet<>();
 
+    @Builder.Default
     private Set<Director> directors = new HashSet<>();
 
     @NotNull(message = "Рейтинг MPA не может быть пустой")
