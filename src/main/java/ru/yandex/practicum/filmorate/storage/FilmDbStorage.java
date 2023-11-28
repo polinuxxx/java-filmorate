@@ -47,7 +47,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     @Transactional(readOnly = true)
     public List<Film> getAll() {
-        String sql = MAIN_SELECT + "order by films.id";
+        String sql = MAIN_SELECT + "order by films.id, genre_id";
 
         return getCompleteFilmFromQuery(sql);
     }
@@ -105,11 +105,11 @@ public class FilmDbStorage implements FilmStorage {
         if (sortBy.equals("likes")) {
             sql = MAIN_SELECT + "left join likes on films.id = likes.film_id " +
                     "where directors.id = ? " +
-                    "group by films.id, genre_id order by count(likes.user_id) desc";
+                    "group by films.id, genre_id order by count(likes.user_id) desc, genre_id";
         } else if (sortBy.equals("year")) {
             sql = MAIN_SELECT + "left join likes on films.id = likes.film_id " +
                     "where directors.id = ? " +
-                    "group by films.id, genre_id order by release_date";
+                    "group by films.id, genre_id order by release_date, genre_id";
         } else {
             throw new IllegalArgumentException("Неподдерживаемый параметр упорядочивания фильмов.");
         }
@@ -163,7 +163,7 @@ public class FilmDbStorage implements FilmStorage {
     private List<Film> getCompleteFilmFromQuery(String sql, Object... params) {
         return jdbcTemplate.query(sql,
                 rs -> {
-                    Map<Long, Film> map = new HashMap<>();
+                    Map<Long, Film> map = new LinkedHashMap<>();
                     while (rs.next()) {
                         if (!map.containsKey(rs.getLong("id"))) {
                             Film film = constructFilmFromQueryResult(rs);

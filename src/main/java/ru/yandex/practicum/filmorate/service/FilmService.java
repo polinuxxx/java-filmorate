@@ -82,6 +82,8 @@ public class FilmService {
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             filmGenreStorage.addGenresToFilm(film.getId(), film.getGenres());
         }
+
+        filmDirectorDbStorage.deleteDirectorsFromFilm(film.getId());
         if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
             filmDirectorDbStorage.addDirectorToFilm(film.getId(), film.getDirectors());
         }
