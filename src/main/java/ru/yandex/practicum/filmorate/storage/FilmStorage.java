@@ -9,4 +9,6 @@ import java.util.List;
  */
 public interface FilmStorage extends Storage<Film> {
     List<Film> getPopular(int count);
+
+    List<Film> getFilmsByDirector(Long directorId, String sortBy);
 }
