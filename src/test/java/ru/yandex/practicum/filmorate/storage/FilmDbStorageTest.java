@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +62,7 @@ class FilmDbStorageTest {
                 .mpa(RatingMpa.builder().id(1L).name("G").description("У фильма нет возрастных ограничений").build())
                 .genres(Set.of(Genre.builder().id(1L).name("Комедия").build(),
                         Genre.builder().id(2L).name("Драма").build()))
+                .directors(new HashSet<>())
                 .build();
 
         secondFilm = Film.builder()
@@ -71,6 +73,7 @@ class FilmDbStorageTest {
                 .releaseDate(LocalDate.of(2023, 7, 9))
                 .mpa(RatingMpa.builder().id(1L).name("G").description("У фильма нет возрастных ограничений").build())
                 .genres(Set.of(Genre.builder().id(1L).name("Комедия").build()))
+                .directors(new HashSet<>())
                 .build();
 
         firstUser = User.builder()
