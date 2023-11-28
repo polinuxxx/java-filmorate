@@ -48,6 +48,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Director create(Director director) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("directors")
@@ -59,6 +60,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Director update(Director director) {
         String sql = "UPDATE directors SET name = ? WHERE id = ?";
 
@@ -70,6 +72,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void delete(Long id) {
         String sql = "DELETE FROM directors WHERE id = ?";
 
