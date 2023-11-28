@@ -15,11 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.converter.ReviewConverter;
+import ru.yandex.practicum.filmorate.dto.converter.ReviewConverter;
+import ru.yandex.practicum.filmorate.model.Reaction;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.request.ReviewCreateRequest;
-import ru.yandex.practicum.filmorate.request.ReviewUpdateRequest;
-import ru.yandex.practicum.filmorate.response.ReviewResponse;
+import ru.yandex.practicum.filmorate.dto.request.ReviewCreateRequest;
+import ru.yandex.practicum.filmorate.dto.request.ReviewUpdateRequest;
+import ru.yandex.practicum.filmorate.dto.response.ReviewResponse;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 /**
@@ -30,10 +31,6 @@ import ru.yandex.practicum.filmorate.service.ReviewService;
 @RequiredArgsConstructor
 @Tag(name = "Reviews", description = "Управление отзывами на фильмы")
 public class ReviewController {
-
-    private static final int LIKE = 1;
-
-    private static final int DISLIKE = -1;
 
     private final ReviewService reviewService;
 
@@ -94,7 +91,7 @@ public class ReviewController {
     @Operation(summary = "Добавление лайка отзыву")
     public void addLike(@PathVariable @Parameter(description = "Идентификатор отзыва") Long id,
                         @PathVariable @Parameter(description = "Идентификатор пользователя") Long userId) {
-        reviewService.addLike(id, userId, LIKE);
+        reviewService.addLike(id, userId, Reaction.LIKE.getCode());
     }
 
     /**
@@ -104,7 +101,7 @@ public class ReviewController {
     @Operation(summary = "Добавление дизлайка отзыву")
     public void addDislike(@PathVariable @Parameter(description = "Идентификатор отзыва") Long id,
                         @PathVariable @Parameter(description = "Идентификатор пользователя") Long userId) {
-        reviewService.addLike(id, userId, DISLIKE);
+        reviewService.addLike(id, userId, Reaction.DISLIKE.getCode());
     }
 
     /**
@@ -114,7 +111,7 @@ public class ReviewController {
     @Operation(summary = "Удаление лайка у отзыва")
     public void deleteLike(@PathVariable @Parameter(description = "Идентификатор отзыва") Long id,
                         @PathVariable @Parameter(description = "Идентификатор пользователя") Long userId) {
-        reviewService.deleteLike(id, userId, LIKE);
+        reviewService.deleteLike(id, userId, Reaction.LIKE.getCode());
     }
 
     /**
@@ -124,6 +121,6 @@ public class ReviewController {
     @Operation(summary = "Удаление дизлайка у отзыва")
     public void deleteDislike(@PathVariable @Parameter(description = "Идентификатор отзыва") Long id,
                            @PathVariable @Parameter(description = "Идентификатор пользователя") Long userId) {
-        reviewService.deleteLike(id, userId, DISLIKE);
+        reviewService.deleteLike(id, userId, Reaction.DISLIKE.getCode());
     }
 }
