@@ -124,6 +124,8 @@ public class FilmService {
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         log.debug("Получение списка фильмов по режисеру directorId={} с сортировкой по {}", directorId, sortBy);
 
+        existsDirector(directorId);
+
         return filmStorage.getFilmsByDirector(directorId, sortBy);
     }
 
@@ -132,6 +134,14 @@ public class FilmService {
 
         if (id != null && !filmStorage.exists(id)) {
             throw new EntityNotFoundException(String.format("Не найден фильм по id = %d.", id));
+        }
+    }
+
+    public void existsDirector(Long id) {
+        log.debug("Проверка режиссера на существование");
+
+        if (id != null && !directorDbStorage.exists(id)) {
+            throw new EntityNotFoundException(String.format("Не найден режиссер по id = %d.", id));
         }
     }
 
