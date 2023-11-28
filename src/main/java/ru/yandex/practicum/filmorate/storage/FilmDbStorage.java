@@ -2,11 +2,8 @@ package ru.yandex.practicum.filmorate.storage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -89,11 +86,23 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Film> getPopular(int count) {
+    public List<Film> getPopular(int count, Optional<Integer> genreId, Optional<Integer> year) {
         String sql = MAIN_SELECT + "left join likes on films.id = likes.film_id " +
-                "group by films.id, genre_id order by count(likes.user_id) desc limit ?";
+                "where 1 = 1 ";
+        List<Object> params = new ArrayList<>();
+        if (genreId.isPresent()) {
+            sql += "and genres.id = ? ";
+            params.add(genreId.get());
+        }
+        if (year.isPresent()) {
+            sql += "and year(films.release_date) = ? ";
+            params.add(year.get());
+        }
+        sql += "group by films.id, genre_id order by count(likes.user_id) desc limit ?";
+        params.add(count);
 
-        return getCompleteFilmFromQuery(sql, count);
+        Object[] paramsArray = params.toArray(new Object[0]);
+        return getCompleteFilmFromQuery(sql, paramsArray);
     }
 
     @Override

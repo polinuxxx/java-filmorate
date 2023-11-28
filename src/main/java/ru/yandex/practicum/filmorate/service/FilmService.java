@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,12 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmGenreDbStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.LikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.RatingMpaStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.*;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Сервис для {@link Film}.
@@ -108,10 +105,12 @@ public class FilmService {
         likeStorage.deleteLikeFromFilm(filmId, userId);
     }
 
-    public List<Film> getPopular(int count) {
-        log.debug("Получение {} самых популярных фильмов по количеству лайков", count);
-
-        return filmStorage.getPopular(count);
+    public List<Film> getPopular(int count, Optional<Integer> genreId, Optional<Integer> year) {
+        StringBuilder logLineBuilder = new StringBuilder("Получение самых популярных фильмов по количеству лайков.");
+        genreId.ifPresent(id -> logLineBuilder.append(" Айди жанра - ").append(id).append("."));
+        year.ifPresent(y -> logLineBuilder.append(" Год выпуска фильма - ").append(y));
+        log.debug(logLineBuilder.toString());
+        return filmStorage.getPopular(count, genreId,year);
     }
 
     public void exists(Long id) {
