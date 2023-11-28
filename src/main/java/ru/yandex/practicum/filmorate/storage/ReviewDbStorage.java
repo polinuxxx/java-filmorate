@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.storage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -29,9 +31,7 @@ public class ReviewDbStorage implements ReviewStorage {
     public Review getById(Long id) {
         String sql = MAIN_SELECT + "and id = ?";
 
-        List<Review> reviews = jdbcTemplate.query(sql, ReviewDbStorage::toReview, id);
-
-        return reviews.get(0);
+       return jdbcTemplate.queryForObject(sql, ReviewDbStorage::toReview, id);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class ReviewDbStorage implements ReviewStorage {
                 .withTableName("reviews")
                 .usingGeneratedKeyColumns("id");
 
-        item.setId(simpleJdbcInsert.executeAndReturnKey(item.toMap()).longValue());
+        item.setId(simpleJdbcInsert.executeAndReturnKey(toMap(item)).longValue());
 
         return getById(item.getId());
     }
@@ -78,7 +78,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     @Transactional(readOnly = true)
     public boolean exists(Long id) {
-        String sql = "select case when count(id) > 0 then true else false end from reviews where id = ?";
+        String sql = "select exists(select id from reviews where id = ?)";
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, id);
 
         return exists != null && exists;
@@ -105,7 +105,7 @@ public class ReviewDbStorage implements ReviewStorage {
         return jdbcTemplate.query(sql, ReviewDbStorage::toReview, count);
     }
 
-    static Review toReview(ResultSet rs, int rowNum) throws SQLException {
+    private static Review toReview(ResultSet rs, int rowNum) throws SQLException {
         return Review.builder()
                 .id(rs.getLong("id"))
                 .content(rs.getString("content"))
@@ -114,5 +114,16 @@ public class ReviewDbStorage implements ReviewStorage {
                 .user(User.builder().id(rs.getLong("user_id")).build())
                 .useful(rs.getInt("useful"))
                 .build();
+    }
+
+    public Map<String, Object> toMap(Review review) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("id", review.getId());
+        values.put("content", review.getContent());
+        values.put("is_positive", review.getIsPositive());
+        values.put("user_id", review.getUser().getId());
+        values.put("film_id", review.getFilm().getId());
+        values.put("useful", 0);
+        return values;
     }
 }

@@ -1,12 +1,12 @@
-package ru.yandex.practicum.filmorate.converter;
+package ru.yandex.practicum.filmorate.dto.converter;
 
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import ru.yandex.practicum.filmorate.dto.request.ReviewCreateRequest;
+import ru.yandex.practicum.filmorate.dto.request.ReviewUpdateRequest;
+import ru.yandex.practicum.filmorate.dto.response.ReviewResponse;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.request.ReviewCreateRequest;
-import ru.yandex.practicum.filmorate.request.ReviewUpdateRequest;
-import ru.yandex.practicum.filmorate.response.ReviewResponse;
 
 /**
  * Конвертер для {@link Review}.

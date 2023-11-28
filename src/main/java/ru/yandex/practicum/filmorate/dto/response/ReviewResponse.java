@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.response;
+package ru.yandex.practicum.filmorate.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
