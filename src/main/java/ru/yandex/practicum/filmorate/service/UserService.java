@@ -55,8 +55,7 @@ public class UserService {
 
         exists(id);
 
-        List<Long> recommendations = userStorage.getRecommendationsFilmIDs(id);
-        return filmStorage.getFilmsFromIdList(recommendations);
+        return filmStorage.getRecommendationFilms(id);
     }
 
     public User create(User user) {

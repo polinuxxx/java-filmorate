@@ -50,42 +50,6 @@ public class UserDbStorage implements UserStorage {
         return getById(item.getId());
     }
 
-    /**
-     * Получение списка id рекомендуемых фильмов по id пользователя.
-     *
-     * @param id пользователя
-     * @return список фильмов
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public List<Long> getRecommendationsFilmIDs(Long id) {
-
-        /*
-        -- Собираем таблицу пользователей с похожими предпочтениями с частотой совпадений
-        -- USER1_ID - ключевой пользователь
-        -- USER2_ID - похожий пользователь
-        -- CNT - частота совпадений предпочтений
-
-        -- Склеиваем похожих пользователей с фильмами
-        -- Исключаем фильмы с отметками ключевого пользователя
-        */
-
-        String sql = "SELECT likesThree.FILM_ID " +
-                "FROM (SELECT likesOne.USER_ID AS USER1_ID, likesTwo.USER_ID AS USER2_ID, COUNT(*) AS CNT " +
-                "      FROM LIKES likesOne " +
-                "               INNER JOIN LIKES likesTwo " +
-                "                          ON likesOne.FILM_ID = likesTwo.FILM_ID " +
-                "                              AND likesOne.USER_ID <> likesTwo.USER_ID AND likesOne.USER_ID = ? " +
-                "      GROUP BY likesTwo.USER_ID) AS near " +
-                "         INNER JOIN LIKES likesThree " +
-                "                    ON near.USER2_ID = likesThree.USER_ID " +
-                "WHERE likesThree.FILM_ID NOT EXIST (SELECT FILM_ID FROM LIKES WHERE USER_ID = near.USER1_ID) " +
-                "ORDER BY near.CNT DESC ";
-
-        return jdbcTemplate.queryForList(sql, Long.class, id);
-
-    }
-
     @Override
     @Transactional
     public User update(User item) {

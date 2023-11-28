@@ -9,7 +9,7 @@ import java.util.List;
  */
 public interface FilmStorage extends Storage<Film> {
 
-    List<Film> getFilmsFromIdList(List<Long> ids);
-
     List<Film> getPopular(int count);
+
+    List<Film> getRecommendationFilms(Long userId);
 }
