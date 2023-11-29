@@ -1,16 +1,24 @@
 package ru.yandex.practicum.filmorate.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ParamNotExistException;
+import ru.yandex.practicum.filmorate.exception.SearchQueryException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.*;
-
-import java.util.List;
+import ru.yandex.practicum.filmorate.storage.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.FilmDirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.FilmGenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.LikeDbStorage;
+import ru.yandex.practicum.filmorate.storage.RatingMpaStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 /**
  * Сервис для {@link Film}.
@@ -126,7 +134,7 @@ public class FilmService {
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         log.debug("Получение списка фильмов по режисеру directorId={} с сортировкой по {}", directorId, sortBy);
 
-        existsDirector(directorId);
+        checkDirectorExists(directorId);
 
         return filmStorage.getFilmsByDirector(directorId, sortBy);
     }
@@ -139,12 +147,18 @@ public class FilmService {
         }
     }
 
-    public void existsDirector(Long id) {
-        log.debug("Проверка режиссера на существование");
+    public List<Film> searchByQueryAndType(String query, String by) {
+        log.debug("Поиск фильма. Запрос на поиск: {}. Поля для поиска: {} ", query, by);
 
-        if (id != null && !directorDbStorage.exists(id)) {
-            throw new EntityNotFoundException(String.format("Не найден режиссер по id = %d.", id));
+        if (by == null || by.isBlank()) {
+            throw new ParamNotExistException("Пустой фильтра поиска. Параметр by должен содержать тип поиска.");
         }
+
+        if (query == null || query.isBlank()) {
+            throw new SearchQueryException("Пустая строка для поиска. Параметр query должен быть заполнен.");
+        }
+
+        return filmStorage.getFilmsByQueryAndType(query, by);
     }
 
     private void validate(Film film) {

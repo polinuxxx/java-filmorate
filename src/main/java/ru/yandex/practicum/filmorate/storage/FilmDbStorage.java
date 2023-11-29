@@ -1,18 +1,25 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.exception.ParamNotExistException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.RatingMpa;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * DAO для {@link Film}.
@@ -33,39 +40,6 @@ public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private static Genre constructGenreFromQueryResult(ResultSet rs) throws SQLException {
-        return Genre.builder()
-                .id(rs.getLong("genre_id"))
-                .name(rs.getString("genre_name"))
-                .build();
-    }
-
-    private static Director constructDirectorFromQueryResult(ResultSet rs) throws SQLException {
-        return Director.builder()
-                .id(rs.getLong("director_id"))
-                .name(rs.getString("director_name"))
-                .build();
-    }
-
-    private static RatingMpa constructRatingMpaFromQueryResult(ResultSet rs) throws SQLException {
-        return RatingMpa.builder()
-                .id(rs.getLong("mpa_id"))
-                .name(rs.getString("mpa_name"))
-                .description(rs.getString("mpa_description"))
-                .build();
-    }
-
-    private static Film constructFilmFromQueryResult(ResultSet rs) throws SQLException {
-        return Film.builder()
-                .id(rs.getLong("id"))
-                .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .duration(rs.getInt("duration_min"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .genres(new HashSet<>())
-                .directors(new HashSet<>())
-                .build();
-    }
 
     @Override
     @Transactional(readOnly = true)
@@ -84,6 +58,48 @@ public class FilmDbStorage implements FilmStorage {
         String sql = MAIN_SELECT + "order by films.id, genre_id";
 
         return getCompleteFilmFromQuery(sql);
+    }
+
+    /**
+     * Метод для поиска фильмов по строке поиска в любом регистре и переданным полям для поиска.
+     *
+     * @param query строка для поиска
+     * @param by поля для поиска через запятую, варианты: director, title
+     * @return список фильмов.
+     */
+    @Override
+    public List<Film> getFilmsByQueryAndType(String query, String by) {
+
+        Set<String> bySet = new HashSet<>(Arrays.asList(by.split(",")));
+        String sql = MAIN_SELECT + "left join likes on films.id = likes.film_id ";
+        ArrayList<String> listParams = new ArrayList<>();
+        String byToQuery = "";
+        Iterator<String> it = bySet.iterator();
+
+        while (it.hasNext()) {
+            switch (it.next()) {
+                case "director":
+                    byToQuery = byToQuery + "LOWER(directors.name) like ? ";
+                    listParams.add("%" + query.toLowerCase() + "%");
+                    break;
+                case "title":
+                    byToQuery = byToQuery + "LOWER(films.name) like ? ";
+                    listParams.add("%" + query.toLowerCase() + "%");
+                    break;
+                default:
+                    throw new ParamNotExistException("Такой команды для поиска пока нет.");
+            }
+
+            if (it.hasNext()) {
+                byToQuery = byToQuery + " OR ";
+            }
+        }
+
+        if (!byToQuery.isEmpty()) {
+            sql = sql + "where " + byToQuery + " group by films.id, genre_id order by count(likes.user_id) desc";
+        }
+
+        return getCompleteFilmFromQuery(sql, listParams.toArray());
     }
 
     /**
@@ -195,6 +211,38 @@ public class FilmDbStorage implements FilmStorage {
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, id);
 
         return exists != null && exists;
+    }
+
+    private Genre constructGenreFromQueryResult(ResultSet rs) throws SQLException {
+        return Genre.builder()
+                .id(rs.getLong("genre_id"))
+                .name(rs.getString("genre_name"))
+                .build();
+    }
+
+    private Director constructDirectorFromQueryResult(ResultSet rs) throws SQLException {
+        return Director.builder()
+                .id(rs.getLong("director_id"))
+                .name(rs.getString("director_name"))
+                .build();
+    }
+
+    private RatingMpa constructRatingMpaFromQueryResult(ResultSet rs) throws SQLException {
+        return RatingMpa.builder()
+                .id(rs.getLong("mpa_id"))
+                .name(rs.getString("mpa_name"))
+                .description(rs.getString("mpa_description"))
+                .build();
+    }
+
+    private Film constructFilmFromQueryResult(ResultSet rs) throws SQLException {
+        return Film.builder()
+                .id(rs.getLong("id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .duration(rs.getInt("duration_min"))
+                .releaseDate(rs.getDate("release_date").toLocalDate())
+                .build();
     }
 
     private List<Film> getCompleteFilmFromQuery(String sql, Object... params) {
