@@ -33,6 +33,40 @@ public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private static Genre constructGenreFromQueryResult(ResultSet rs) throws SQLException {
+        return Genre.builder()
+                .id(rs.getLong("genre_id"))
+                .name(rs.getString("genre_name"))
+                .build();
+    }
+
+    private static Director constructDirectorFromQueryResult(ResultSet rs) throws SQLException {
+        return Director.builder()
+                .id(rs.getLong("director_id"))
+                .name(rs.getString("director_name"))
+                .build();
+    }
+
+    private static RatingMpa constructRatingMpaFromQueryResult(ResultSet rs) throws SQLException {
+        return RatingMpa.builder()
+                .id(rs.getLong("mpa_id"))
+                .name(rs.getString("mpa_name"))
+                .description(rs.getString("mpa_description"))
+                .build();
+    }
+
+    private static Film constructFilmFromQueryResult(ResultSet rs) throws SQLException {
+        return Film.builder()
+                .id(rs.getLong("id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .duration(rs.getInt("duration_min"))
+                .releaseDate(rs.getDate("release_date").toLocalDate())
+                .genres(new HashSet<>())
+                .directors(new HashSet<>())
+                .build();
+    }
+
     @Override
     @Transactional(readOnly = true)
     public Film getById(Long id) {
@@ -124,40 +158,6 @@ public class FilmDbStorage implements FilmStorage {
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, id);
 
         return exists != null && exists;
-    }
-
-    private Genre constructGenreFromQueryResult(ResultSet rs) throws SQLException {
-        return Genre.builder()
-                .id(rs.getLong("genre_id"))
-                .name(rs.getString("genre_name"))
-                .build();
-    }
-
-    private Director constructDirectorFromQueryResult(ResultSet rs) throws SQLException {
-        return Director.builder()
-                .id(rs.getLong("director_id"))
-                .name(rs.getString("director_name"))
-                .build();
-    }
-
-    private RatingMpa constructRatingMpaFromQueryResult(ResultSet rs) throws SQLException {
-        return RatingMpa.builder()
-                .id(rs.getLong("mpa_id"))
-                .name(rs.getString("mpa_name"))
-                .description(rs.getString("mpa_description"))
-                .build();
-    }
-
-    private Film constructFilmFromQueryResult(ResultSet rs) throws SQLException {
-        return Film.builder()
-                .id(rs.getLong("id"))
-                .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .duration(rs.getInt("duration_min"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .genres(new HashSet<>())
-                .directors(new HashSet<>())
-                .build();
     }
 
     private List<Film> getCompleteFilmFromQuery(String sql, Object... params) {
