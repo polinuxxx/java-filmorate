@@ -71,23 +71,23 @@ public class ReviewService {
         reviewStorage.delete(id);
     }
 
-    public void addLike(Long reviewId, Long userId, Reaction reaction) {
+    public void addReaction(Long reviewId, Long userId, Reaction reaction) {
         log.debug("Добавление лайка/дизлайка отзыву с id = {} пользователем {}", reviewId, userId);
 
         exists(reviewId);
         checkUserExists(userId);
 
-        reviewLikeStorage.addLikeToReview(reviewId, userId, reaction.getCode());
+        reviewLikeStorage.addReactionToReview(reviewId, userId, reaction.getCode());
         reviewStorage.recalculateUseful(reviewId, reaction.getCode());
     }
 
-    public void deleteLike(Long reviewId, Long userId, Reaction reaction) {
+    public void deleteReaction(Long reviewId, Long userId, Reaction reaction) {
         log.debug("Удаление лайка/дизлайка у отзыва с id = {} пользователем {}", reviewId, userId);
 
         exists(reviewId);
         checkUserExists(userId);
 
-        reviewLikeStorage.deleteLikeFromReview(reviewId, userId, reaction.getCode());
+        reviewLikeStorage.deleteReactionFromReview(reviewId, userId, reaction.getCode());
         reviewStorage.recalculateUseful(reviewId, reaction.getCode());
     }
 
