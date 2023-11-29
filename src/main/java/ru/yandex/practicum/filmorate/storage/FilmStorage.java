@@ -9,5 +9,10 @@ import java.util.Optional;
  * Интерфейс для хранилища {@link Film}.
  */
 public interface FilmStorage extends Storage<Film> {
+
+    List<Film> getFilmsByDirector(Long directorId, String sortBy);
+
+    List<Film> getRecommendationFilms(Long userId);
+
     List<Film> getPopular(int count, Optional<Integer> genreId, Optional<Integer> year);
 }

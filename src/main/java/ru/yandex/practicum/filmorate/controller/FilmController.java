@@ -85,4 +85,15 @@ public class FilmController {
                                  @RequestParam(required = false) Optional<Integer> year) {
         return filmService.getPopular(count,genreId,year);
     }
+
+    /**
+     * Получение списка фильмов по режисеру, с сортировкой
+     * @param directorId
+     * @param sortBy
+     * @return
+     */
+    @GetMapping("/director/{directorId}")
+    public List<Film> getFilmsByDirector(@PathVariable Long directorId, @RequestParam String sortBy) {
+        return filmService.getFilmsByDirector(directorId, sortBy);
+    }
 }
