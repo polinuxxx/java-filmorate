@@ -15,13 +15,13 @@ public class ReviewLikeDbStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Transactional
-    public void addLikeToReview(Long reviewId, Long userId, Integer reaction) {
+    public void addReactionToReview(Long reviewId, Long userId, Integer reaction) {
         jdbcTemplate.update("merge into review_likes (review_id, user_id, reaction) values (?, ?, ?)",
                 reviewId, userId, reaction);
     }
 
     @Transactional
-    public void deleteLikeFromReview(Long reviewId, Long userId, Integer reaction) {
+    public void deleteReactionFromReview(Long reviewId, Long userId, Integer reaction) {
         jdbcTemplate.update("delete from review_likes where review_id = ? and user_id = ? and reaction = ?",
                 reviewId, userId, reaction);
     }
