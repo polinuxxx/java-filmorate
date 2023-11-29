@@ -11,6 +11,8 @@ import ru.yandex.practicum.filmorate.exception.ParamNotExistException;
 import ru.yandex.practicum.filmorate.exception.SearchQueryException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.FilmDirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.FilmGenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
@@ -132,7 +134,7 @@ public class FilmService {
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         log.debug("Получение списка фильмов по режисеру directorId={} с сортировкой по {}", directorId, sortBy);
 
-        existsDirector(directorId);
+        checkDirectorExists(directorId);
 
         return filmStorage.getFilmsByDirector(directorId, sortBy);
     }
@@ -145,8 +147,8 @@ public class FilmService {
         }
     }
 
-    public List<Film> search(String query, String by) {
-        log.debug("Поиск фильмов");
+    public List<Film> searchByQueryAndType(String query, String by) {
+        log.debug("Поиск фильма. Запрос на поиск: {}. Поля для поиска: {} ", query, by);
 
         if (by == null || by.isEmpty()) {
             throw new ParamNotExistException("Пустой фильтра поиска. Параметр by должен содержать тип поиска.");
@@ -155,11 +157,8 @@ public class FilmService {
         if (query == null || query.isEmpty()) {
             throw new SearchQueryException("Пустая строка для поиска. Параметр query должен быть заполнен.");
         }
-        String[] params = by.split(",");
-        HashSet<String> stringHashSet = new HashSet<>();
-        stringHashSet.addAll(Arrays.asList(params));
 
-        return filmStorage.search(query, stringHashSet);
+        return filmStorage.getFilmsByQueryAndType(query, by);
     }
 
     private void validate(Film film) {
