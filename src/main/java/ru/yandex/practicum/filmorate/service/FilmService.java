@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,12 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmGenreDbStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.LikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.RatingMpaStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.*;
+
+import java.util.List;
 
 /**
  * Сервис для {@link Film}.
@@ -31,12 +27,16 @@ public class FilmService {
 
     private final GenreStorage genreStorage;
 
+    private final DirectorDbStorage directorDbStorage;
+
     @Qualifier("userDbStorage")
     private final UserStorage userStorage;
 
     private final RatingMpaStorage ratingMpaStorage;
 
     private final FilmGenreDbStorage filmGenreStorage;
+
+    private final FilmDirectorDbStorage filmDirectorDbStorage;
 
     public List<Film> getAll() {
         List<Film> films = filmStorage.getAll();
@@ -65,6 +65,10 @@ public class FilmService {
             filmGenreStorage.addGenresToFilm(createdFilm.getId(), film.getGenres());
         }
 
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+            filmDirectorDbStorage.addDirectorToFilm(createdFilm.getId(), film.getDirectors());
+        }
+
         return getById(createdFilm.getId());
     }
 
@@ -77,6 +81,11 @@ public class FilmService {
         filmGenreStorage.deleteGenresFromFilm(film.getId());
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             filmGenreStorage.addGenresToFilm(film.getId(), film.getGenres());
+        }
+
+        filmDirectorDbStorage.deleteDirectorsFromFilm(film.getId());
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+            filmDirectorDbStorage.addDirectorToFilm(film.getId(), film.getDirectors());
         }
 
         return filmStorage.update(film);
@@ -114,11 +123,27 @@ public class FilmService {
         return filmStorage.getPopular(count);
     }
 
+    public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
+        log.debug("Получение списка фильмов по режисеру directorId={} с сортировкой по {}", directorId, sortBy);
+
+        existsDirector(directorId);
+
+        return filmStorage.getFilmsByDirector(directorId, sortBy);
+    }
+
     public void exists(Long id) {
         log.debug("Проверка фильма на существование");
 
         if (id != null && !filmStorage.exists(id)) {
             throw new EntityNotFoundException(String.format("Не найден фильм по id = %d.", id));
+        }
+    }
+
+    public void existsDirector(Long id) {
+        log.debug("Проверка режиссера на существование");
+
+        if (id != null && !directorDbStorage.exists(id)) {
+            throw new EntityNotFoundException(String.format("Не найден режиссер по id = %d.", id));
         }
     }
 
@@ -129,12 +154,19 @@ public class FilmService {
 
         exists(film.getId());
         film.getGenres().forEach(genre -> checkGenreExists(genre.getId()));
+        film.getDirectors().forEach(director -> checkDirectorExists(director.getId()));
         checkMpaExists(film.getMpa().getId());
     }
 
     private void checkGenreExists(Long genreId) {
         if (genreId != null && !genreStorage.exists(genreId)) {
             throw new EntityNotFoundException(String.format("Не найден жанр по id = %d.", genreId));
+        }
+    }
+
+    private void checkDirectorExists(Long directorId) {
+        if (directorId != null && !directorDbStorage.exists(directorId)) {
+            throw new EntityNotFoundException(String.format("Не найден режиссер по id = %d.", directorId));
         }
     }
 
