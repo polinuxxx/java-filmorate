@@ -91,4 +91,12 @@ public class FilmController {
     public List<Film> getFilmsByDirector(@PathVariable Long directorId, @RequestParam String sortBy) {
         return filmService.getFilmsByDirector(directorId, sortBy);
     }
+
+    /**
+     * Получение списка общих фильмов ( общий фильм - есть лайк от двух юзеров)
+     */
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId){
+        return filmService.getCommonFilms(userId,friendId);
+    }
 }

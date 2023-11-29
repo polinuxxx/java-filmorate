@@ -131,6 +131,13 @@ public class FilmService {
         return filmStorage.getFilmsByDirector(directorId, sortBy);
     }
 
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        log.debug("Получение общих фильмов у пользователя {} и пользователя {}", userId, friendId);
+        checkUserExists(userId);
+        checkUserExists(friendId);
+        return filmStorage.getCommonFilms(userId,friendId);
+    }
+
     public void exists(Long id) {
         log.debug("Проверка фильма на существование");
 
@@ -146,7 +153,6 @@ public class FilmService {
             throw new EntityNotFoundException(String.format("Не найден режиссер по id = %d.", id));
         }
     }
-
     private void validate(Film film) {
         if (film == null) {
             throw new ValidationException("Передан пустой объект фильма.");

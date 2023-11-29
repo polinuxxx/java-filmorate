@@ -89,7 +89,7 @@ public class FilmDbStorage implements FilmStorage {
     /**
      * Получение списка рекомендуемых фильмов по айди пользователя.
      *
-     * @param userId  id пользователя
+     * @param userId id пользователя
      * @return List фильмов.
      */
     @Override
@@ -121,6 +121,16 @@ public class FilmDbStorage implements FilmStorage {
         String sql = MAIN_SELECT + ", (" + recommendedFilmIdsQuery + ") as top where top.FILM_ID = films.ID order by genre_id";
 
         return getCompleteFilmFromQuery(sql, userId);
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        String sql = MAIN_SELECT + "join (select film_id from likes where user_id = ?) ua1 on films.id = ua1.film_id " +
+                "join (select film_id from likes where user_id = ?) ua2 on films.id = ua2.film_id " +
+                "join (select film_id, count(*) as like_count from likes group by film_id) lc " +
+                "on films.id = lc.film_id " +
+                "order by lc.like_count desc";
+        return getCompleteFilmFromQuery(sql, userId,friendId);
     }
 
     @Override

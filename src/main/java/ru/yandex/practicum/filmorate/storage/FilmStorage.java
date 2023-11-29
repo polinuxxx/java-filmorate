@@ -15,4 +15,5 @@ public interface FilmStorage extends Storage<Film> {
 
     List<Film> getRecommendationFilms(Long userId);
 
+    List<Film> getCommonFilms(Long userId, Long friendId);
 }
