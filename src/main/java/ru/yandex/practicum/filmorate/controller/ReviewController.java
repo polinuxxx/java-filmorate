@@ -91,7 +91,7 @@ public class ReviewController {
     @Operation(summary = "Добавление лайка отзыву")
     public void addLike(@PathVariable @Parameter(description = "Идентификатор отзыва") Long id,
                         @PathVariable @Parameter(description = "Идентификатор пользователя") Long userId) {
-        reviewService.addLike(id, userId, Reaction.LIKE.getCode());
+        reviewService.addLike(id, userId, Reaction.LIKE);
     }
 
     /**
@@ -101,7 +101,7 @@ public class ReviewController {
     @Operation(summary = "Добавление дизлайка отзыву")
     public void addDislike(@PathVariable @Parameter(description = "Идентификатор отзыва") Long id,
                         @PathVariable @Parameter(description = "Идентификатор пользователя") Long userId) {
-        reviewService.addLike(id, userId, Reaction.DISLIKE.getCode());
+        reviewService.addLike(id, userId, Reaction.DISLIKE);
     }
 
     /**
@@ -111,7 +111,7 @@ public class ReviewController {
     @Operation(summary = "Удаление лайка у отзыва")
     public void deleteLike(@PathVariable @Parameter(description = "Идентификатор отзыва") Long id,
                         @PathVariable @Parameter(description = "Идентификатор пользователя") Long userId) {
-        reviewService.deleteLike(id, userId, Reaction.LIKE.getCode());
+        reviewService.deleteLike(id, userId, Reaction.LIKE);
     }
 
     /**
@@ -121,6 +121,6 @@ public class ReviewController {
     @Operation(summary = "Удаление дизлайка у отзыва")
     public void deleteDislike(@PathVariable @Parameter(description = "Идентификатор отзыва") Long id,
                            @PathVariable @Parameter(description = "Идентификатор пользователя") Long userId) {
-        reviewService.deleteLike(id, userId, Reaction.DISLIKE.getCode());
+        reviewService.deleteLike(id, userId, Reaction.DISLIKE);
     }
 }
