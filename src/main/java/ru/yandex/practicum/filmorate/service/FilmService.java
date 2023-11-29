@@ -150,11 +150,11 @@ public class FilmService {
     public List<Film> searchByQueryAndType(String query, String by) {
         log.debug("Поиск фильма. Запрос на поиск: {}. Поля для поиска: {} ", query, by);
 
-        if (by == null || by.isEmpty()) {
+        if (by == null || by.isBlank()) {
             throw new ParamNotExistException("Пустой фильтра поиска. Параметр by должен содержать тип поиска.");
         }
 
-        if (query == null || query.isEmpty()) {
+        if (query == null || query.isBlank()) {
             throw new SearchQueryException("Пустая строка для поиска. Параметр query должен быть заполнен.");
         }
 

@@ -38,7 +38,7 @@ public class FilmController {
      *
      * @param query Строка запроса.
      * @param by тип поиска через запятую. Возможные значения: director, title
-     * @return Списко фильмов.
+     * @return Список фильмов.
      */
     @GetMapping("/search")
     public List<Film> searchByQueryAndType(@RequestParam("query") String query,

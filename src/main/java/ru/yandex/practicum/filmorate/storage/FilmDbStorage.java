@@ -70,19 +70,12 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getFilmsByQueryAndType(String query, String by) {
 
-        //Соберем поля для поиска
         Set<String> bySet = new HashSet<>(Arrays.asList(by.split(",")));
-
-        //Добавим лайки для сортировки
         String sql = MAIN_SELECT + "left join likes on films.id = likes.film_id ";
-
-        //Сюда соберем параметры для запроса
         ArrayList<String> listParams = new ArrayList<>();
-
-        //Сюда соберем начинку для where т.к. если несколько полей то ищется в любом из них.
         String byToQuery = "";
-
         Iterator<String> it = bySet.iterator();
+
         while (it.hasNext()) {
             switch (it.next()) {
                 case "director":
@@ -97,13 +90,11 @@ public class FilmDbStorage implements FilmStorage {
                     throw new ParamNotExistException("Такой команды для поиска пока нет.");
             }
 
-            //Если есть следующий элемент добавим OR
             if (it.hasNext()) {
                 byToQuery = byToQuery + " OR ";
             }
         }
 
-        //Дополним основной запрос и добавим сортировку по популярности
         if (!byToQuery.isEmpty()) {
             sql = sql + "where " + byToQuery + " group by films.id, genre_id order by count(likes.user_id) desc";
         }
