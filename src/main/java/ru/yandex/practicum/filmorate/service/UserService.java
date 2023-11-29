@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,9 +8,14 @@ import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.event.Event;
+import ru.yandex.practicum.filmorate.model.event.EventType;
+import ru.yandex.practicum.filmorate.model.event.Operation;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.FriendDbStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+
+import java.util.List;
 
 /**
  * Сервис для {@link User}.
@@ -28,6 +32,8 @@ public class UserService {
     private final FilmStorage filmStorage;
 
     private final FriendDbStorage friendStorage;
+
+    private final EventService eventService;
 
     public List<User> getAll() {
         List<User> users = userStorage.getAll();
@@ -89,6 +95,7 @@ public class UserService {
         exists(friendId);
 
         friendStorage.addFriendToUser(userId, friendId);
+        eventService.add(new Event(userId, EventType.FRIEND, Operation.ADD, friendId));
     }
 
     public void deleteFriend(Long userId, Long friendId) {
@@ -98,6 +105,7 @@ public class UserService {
         exists(friendId);
 
         friendStorage.deleteFriendFromUser(userId, friendId);
+        eventService.add(new Event(userId, EventType.FRIEND, Operation.REMOVE, friendId));
     }
 
     public List<User> getFriends(Long id) {
@@ -123,6 +131,14 @@ public class UserService {
         if (id != null && !userStorage.exists(id)) {
             throw new EntityNotFoundException(String.format("Не найден пользователь по id = %d.", id));
         }
+    }
+
+    public List<Event> getFeed(Long userId, int count) {
+        log.debug("Получение последних событий друзей пользователя с id = {} и лимитом в {} записей", userId, count);
+
+        exists(userId);
+
+        return eventService.getEventsByUserid(userId, count);
     }
 
     private void validate(User user) {

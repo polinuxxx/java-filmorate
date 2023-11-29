@@ -8,6 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.event.Event;
+import ru.yandex.practicum.filmorate.model.event.EventType;
+import ru.yandex.practicum.filmorate.model.event.Operation;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.List;
@@ -37,6 +40,8 @@ public class FilmService {
     private final FilmGenreDbStorage filmGenreStorage;
 
     private final FilmDirectorDbStorage filmDirectorDbStorage;
+
+    private final EventService eventService;
 
     public List<Film> getAll() {
         List<Film> films = filmStorage.getAll();
@@ -106,6 +111,7 @@ public class FilmService {
         checkUserExists(userId);
 
         likeStorage.addLikeToFilm(filmId, userId);
+        eventService.add(new Event(userId, EventType.LIKE, Operation.ADD, filmId));
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -115,6 +121,7 @@ public class FilmService {
         checkUserExists(userId);
 
         likeStorage.deleteLikeFromFilm(filmId, userId);
+        eventService.add(new Event(userId, EventType.LIKE, Operation.REMOVE, filmId));
     }
 
     public List<Film> getPopular(int count) {
@@ -124,7 +131,7 @@ public class FilmService {
     }
 
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
-        log.debug("Получение списка фильмов по режисеру directorId={} с сортировкой по {}", directorId, sortBy);
+        log.debug("Получение списка фильмов по режиссеру directorId={} с сортировкой по {}", directorId, sortBy);
 
         existsDirector(directorId);
 
