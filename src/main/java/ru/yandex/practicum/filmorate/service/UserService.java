@@ -95,7 +95,13 @@ public class UserService {
         exists(friendId);
 
         friendStorage.addFriendToUser(userId, friendId);
-        eventService.add(new Event(userId, EventType.FRIEND, Operation.ADD, friendId));
+        User user = userStorage.getById(userId);
+        eventService.add(Event.builder()
+                .user(user)
+                .type(EventType.FRIEND)
+                .operation(Operation.ADD)
+                .entityId(friendId)
+                .build());
     }
 
     public void deleteFriend(Long userId, Long friendId) {
@@ -105,7 +111,13 @@ public class UserService {
         exists(friendId);
 
         friendStorage.deleteFriendFromUser(userId, friendId);
-        eventService.add(new Event(userId, EventType.FRIEND, Operation.REMOVE, friendId));
+        User user = userStorage.getById(userId);
+        eventService.add(Event.builder()
+                .user(user)
+                .type(EventType.FRIEND)
+                .operation(Operation.REMOVE)
+                .entityId(friendId)
+                .build());
     }
 
     public List<User> getFriends(Long id) {

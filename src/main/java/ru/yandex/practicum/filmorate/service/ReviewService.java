@@ -59,7 +59,11 @@ public class ReviewService {
         validate(review);
 
         review = reviewStorage.create(review);
-        eventService.add(new Event(review.getUser().getId(), EventType.REVIEW, Operation.ADD, review.getId()));
+        eventService.add(Event.builder()
+                .user(review.getUser())
+                .type(EventType.REVIEW)
+                .operation(Operation.ADD)
+                .entityId(review.getId()).build());
         return review;
     }
 
@@ -69,7 +73,11 @@ public class ReviewService {
         validate(review);
 
         review = reviewStorage.update(review);
-        eventService.add(new Event(review.getUser().getId(), EventType.REVIEW, Operation.UPDATE, review.getId()));
+        eventService.add(Event.builder()
+                .user(review.getUser())
+                .type(EventType.REVIEW)
+                .operation(Operation.UPDATE)
+                .entityId(review.getId()).build());
         return review;
     }
 
@@ -80,7 +88,11 @@ public class ReviewService {
 
         Review review = reviewStorage.getById(id);
         reviewStorage.delete(id);
-        eventService.add(new Event(review.getUser().getId(), EventType.REVIEW, Operation.REMOVE, review.getId()));
+        eventService.add(Event.builder()
+                .user(review.getUser())
+                .type(EventType.REVIEW)
+                .operation(Operation.REMOVE)
+                .entityId(review.getId()).build());
     }
 
     public void addReaction(Long reviewId, Long userId, Reaction reaction) {

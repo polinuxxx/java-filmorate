@@ -25,7 +25,6 @@ public class EventService {
      * @param event - событие пользователя
      * @return - событие пользователя, записанное в хранилище
      */
-    @Transactional
     public Event add(Event event) {
         return eventStorage.create(event);
     }
@@ -37,7 +36,6 @@ public class EventService {
      * @param count  - максимальное кол-во возвращаемых событий
      * @return - список событий пользователя
      */
-    @Transactional(readOnly = true)
     public List<Event> getEventsByUserid(Long userId, int count) {
         return eventStorage.getEventsByUserid(userId, count);
     }

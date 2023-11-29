@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ParamNotExistException;
 import ru.yandex.practicum.filmorate.exception.SearchQueryException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.event.Event;
 import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.model.event.Operation;
@@ -121,7 +122,13 @@ public class FilmService {
         checkUserExists(userId);
 
         likeStorage.addLikeToFilm(filmId, userId);
-        eventService.add(new Event(userId, EventType.LIKE, Operation.ADD, filmId));
+        User user = userStorage.getById(userId);
+        eventService.add(Event.builder()
+                .user(user)
+                .type(EventType.LIKE)
+                .operation(Operation.ADD)
+                .entityId(filmId)
+                .build());
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -131,7 +138,13 @@ public class FilmService {
         checkUserExists(userId);
 
         likeStorage.deleteLikeFromFilm(filmId, userId);
-        eventService.add(new Event(userId, EventType.LIKE, Operation.REMOVE, filmId));
+        User user = userStorage.getById(userId);
+        eventService.add(Event.builder()
+                .user(user)
+                .type(EventType.LIKE)
+                .operation(Operation.REMOVE)
+                .entityId(filmId)
+                .build());
     }
 
     public List<Film> getPopular(int count) {
