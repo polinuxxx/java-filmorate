@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import ru.yandex.practicum.filmorate.model.AbstractEntity;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.Instant;
 
@@ -18,17 +19,9 @@ import java.time.Instant;
 @SuperBuilder
 public class Event extends AbstractEntity {
 
-    Long eventId;
     Instant createdAt;
-    Long userId;
+    User user;
     EventType type;
     Operation operation;
     Long entityId;
-
-    public Event(Long userId, EventType type, Operation operation, Long entityId) {
-        this.userId = userId;
-        this.type = type;
-        this.operation = operation;
-        this.entityId = entityId;
-    }
 }

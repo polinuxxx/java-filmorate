@@ -5,6 +5,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.event.Event;
 import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.model.event.Operation;
@@ -24,6 +26,7 @@ public class EventDbStorage implements EventStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
+    @Transactional
     @Override
     public Event create(Event item) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -32,7 +35,7 @@ public class EventDbStorage implements EventStorage {
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(query, new String[]{"id"});
-            ps.setLong(1, item.getUserId());
+            ps.setLong(1, item.getUser().getId());
             ps.setInt(2, item.getType().getCode());
             ps.setInt(3, item.getOperation().getCode());
             ps.setLong(4, item.getEntityId());
@@ -44,6 +47,7 @@ public class EventDbStorage implements EventStorage {
         return item;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Event> getEventsByUserid(Long userId, int count) {
         String query = "SELECT id, created_at, user_id, type, operation, entity_id\n" +
@@ -53,7 +57,7 @@ public class EventDbStorage implements EventStorage {
                 "LIMIT ?";
 
         return jdbcTemplate.query(query,
-                EventDbStorage::toEvent,
+                this::toEvent,
                 userId, count);
     }
 
@@ -82,11 +86,11 @@ public class EventDbStorage implements EventStorage {
         throw new UnsupportedOperationException("Операция не разрешена");
     }
 
-    private static Event toEvent(ResultSet rs, int rowNum) throws SQLException {
+    private Event toEvent(ResultSet rs, int rowNum) throws SQLException {
         return Event.builder()
                 .id(rs.getLong("id"))
                 .createdAt(rs.getTimestamp("created_at").toInstant())
-                .userId(rs.getLong("user_id"))
+                .user(User.builder().id(rs.getLong("user_id")).build())
                 .type(EventType.valueOf(rs.getInt("type")))
                 .operation(Operation.valueOf(rs.getInt("operation")))
                 .entityId(rs.getLong("entity_id"))
