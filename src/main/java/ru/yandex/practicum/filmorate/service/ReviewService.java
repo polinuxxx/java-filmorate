@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Reaction;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewLikeDbStorage;
@@ -70,24 +71,24 @@ public class ReviewService {
         reviewStorage.delete(id);
     }
 
-    public void addLike(Long reviewId, Long userId, Integer reaction) {
+    public void addLike(Long reviewId, Long userId, Reaction reaction) {
         log.debug("Добавление лайка/дизлайка отзыву с id = {} пользователем {}", reviewId, userId);
 
         exists(reviewId);
         checkUserExists(userId);
 
-        reviewLikeStorage.addLikeToReview(reviewId, userId, reaction);
-        reviewStorage.recalculateUseful(reviewId, reaction);
+        reviewLikeStorage.addLikeToReview(reviewId, userId, reaction.getCode());
+        reviewStorage.recalculateUseful(reviewId, reaction.getCode());
     }
 
-    public void deleteLike(Long reviewId, Long userId, Integer reaction) {
+    public void deleteLike(Long reviewId, Long userId, Reaction reaction) {
         log.debug("Удаление лайка/дизлайка у отзыва с id = {} пользователем {}", reviewId, userId);
 
         exists(reviewId);
         checkUserExists(userId);
 
-        reviewLikeStorage.deleteLikeFromReview(reviewId, userId, reaction);
-        reviewStorage.recalculateUseful(reviewId, reaction);
+        reviewLikeStorage.deleteLikeFromReview(reviewId, userId, reaction.getCode());
+        reviewStorage.recalculateUseful(reviewId, reaction.getCode());
     }
 
     public List<Review> getByFilmId(Long filmId, Integer count) {
