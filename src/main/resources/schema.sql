@@ -90,6 +90,16 @@ create table if not exists FRIENDS
             on delete cascade
 );
 
+create table if not exists EVENTS
+(
+    ID BIGINT auto_increment primary key,
+    CREATED_AT TIMESTAMP not null,
+    USER_ID BIGINT not null references USERS(ID),
+    TYPE INTEGER not null,
+    OPERATION INTEGER not null,
+    ENTITY_ID BIGINT not null
+);
+
 create table if not exists LIKES
 (
     USER_ID BIGINT not null,

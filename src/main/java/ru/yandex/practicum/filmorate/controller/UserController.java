@@ -5,6 +5,8 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.dto.converter.EventConverter;
+import ru.yandex.practicum.filmorate.dto.response.EventResponse;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -17,6 +19,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 public class UserController {
 
     private final UserService userService;
+    private final EventConverter eventConverter;
 
     /**
      * Получение всех пользователей.
@@ -84,5 +87,13 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
         return userService.getCommonFriends(id, otherId);
+    }
+
+    /**
+     * Получение ленты пользователя.
+     */
+    @GetMapping("/{id}/feed")
+    public List<EventResponse> getFeed(@PathVariable Long id, @RequestParam(defaultValue = "1000") int count) {
+        return eventConverter.convert(userService.getFeed(id, count));
     }
 }

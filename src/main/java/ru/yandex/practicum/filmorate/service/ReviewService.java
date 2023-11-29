@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,10 +8,15 @@ import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Reaction;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.event.Event;
+import ru.yandex.practicum.filmorate.model.event.EventType;
+import ru.yandex.practicum.filmorate.model.event.Operation;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewLikeDbStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+
+import java.util.List;
 
 /**
  * Сервис для {@link Review}.
@@ -31,6 +35,8 @@ public class ReviewService {
     private final UserStorage userStorage;
 
     private final ReviewLikeDbStorage reviewLikeStorage;
+
+    private final EventService eventService;
 
     public List<Review> getAll() {
         List<Review> reviews = reviewStorage.getAll();
@@ -52,7 +58,9 @@ public class ReviewService {
 
         validate(review);
 
-        return reviewStorage.create(review);
+        review = reviewStorage.create(review);
+        eventService.add(new Event(review.getUser().getId(), EventType.REVIEW, Operation.ADD, review.getId()));
+        return review;
     }
 
     public Review update(Review review) {
@@ -60,7 +68,9 @@ public class ReviewService {
 
         validate(review);
 
-        return reviewStorage.update(review);
+        review = reviewStorage.update(review);
+        eventService.add(new Event(review.getUser().getId(), EventType.REVIEW, Operation.UPDATE, review.getId()));
+        return review;
     }
 
     public void delete(Long id) {
@@ -68,7 +78,9 @@ public class ReviewService {
 
         exists(id);
 
+        Review review = reviewStorage.getById(id);
         reviewStorage.delete(id);
+        eventService.add(new Event(review.getUser().getId(), EventType.REVIEW, Operation.REMOVE, review.getId()));
     }
 
     public void addReaction(Long reviewId, Long userId, Reaction reaction) {
