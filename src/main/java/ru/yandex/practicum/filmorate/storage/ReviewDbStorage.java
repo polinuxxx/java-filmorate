@@ -116,7 +116,7 @@ public class ReviewDbStorage implements ReviewStorage {
                 .build();
     }
 
-    public Map<String, Object> toMap(Review review) {
+    private Map<String, Object> toMap(Review review) {
         Map<String, Object> values = new HashMap<>();
         values.put("id", review.getId());
         values.put("content", review.getContent());
