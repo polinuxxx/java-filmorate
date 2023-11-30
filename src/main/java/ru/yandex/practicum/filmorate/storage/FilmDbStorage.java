@@ -205,7 +205,6 @@ public class FilmDbStorage implements FilmStorage {
                 "AND films.ID = top.id " +
                 "group by films.id, genre_id " +
                 "order by top.cnt desc, genre_id";
-
         List<Object> params = new ArrayList<>();
         params.add(count);
         if (!Objects.isNull(genreId)) {
