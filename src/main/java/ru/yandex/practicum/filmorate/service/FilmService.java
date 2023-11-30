@@ -9,8 +9,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ParamNotExistException;
+import ru.yandex.practicum.filmorate.exception.SearchQueryException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.event.Event;
+import ru.yandex.practicum.filmorate.model.event.EventType;
+import ru.yandex.practicum.filmorate.model.event.Operation;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.List;
@@ -44,6 +50,8 @@ public class FilmService {
     private final FilmGenreDbStorage filmGenreStorage;
 
     private final FilmDirectorDbStorage filmDirectorDbStorage;
+
+    private final EventService eventService;
 
     public List<Film> getAll() {
         List<Film> films = filmStorage.getAll();
@@ -113,6 +121,13 @@ public class FilmService {
         checkUserExists(userId);
 
         likeStorage.addLikeToFilm(filmId, userId);
+        User user = userStorage.getById(userId);
+        eventService.add(Event.builder()
+                .user(user)
+                .type(EventType.LIKE)
+                .operation(Operation.ADD)
+                .entityId(filmId)
+                .build());
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -122,6 +137,13 @@ public class FilmService {
         checkUserExists(userId);
 
         likeStorage.deleteLikeFromFilm(filmId, userId);
+        User user = userStorage.getById(userId);
+        eventService.add(Event.builder()
+                .user(user)
+                .type(EventType.LIKE)
+                .operation(Operation.REMOVE)
+                .entityId(filmId)
+                .build());
     }
 
     public List<Film> getPopular(int count, Integer genreId, Integer year) {
@@ -134,9 +156,9 @@ public class FilmService {
 
 
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
-        log.debug("Получение списка фильмов по режисеру directorId={} с сортировкой по {}", directorId, sortBy);
+        log.debug("Получение списка фильмов по режиссеру directorId={} с сортировкой по {}", directorId, sortBy);
 
-        existsDirector(directorId);
+        checkDirectorExists(directorId);
 
         return filmStorage.getFilmsByDirector(directorId, sortBy);
     }
@@ -149,12 +171,18 @@ public class FilmService {
         }
     }
 
-    public void existsDirector(Long id) {
-        log.debug("Проверка режиссера на существование");
+    public List<Film> searchByQueryAndType(String query, String by) {
+        log.debug("Поиск фильма. Запрос на поиск: {}. Поля для поиска: {} ", query, by);
 
-        if (id != null && !directorDbStorage.exists(id)) {
-            throw new EntityNotFoundException(String.format("Не найден режиссер по id = %d.", id));
+        if (by == null || by.isBlank()) {
+            throw new ParamNotExistException("Пустой фильтра поиска. Параметр by должен содержать тип поиска.");
         }
+
+        if (query == null || query.isBlank()) {
+            throw new SearchQueryException("Пустая строка для поиска. Параметр query должен быть заполнен.");
+        }
+
+        return filmStorage.getFilmsByQueryAndType(query, by);
     }
 
     private void validate(Film film) {
