@@ -143,9 +143,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getCommonFilms(Long userId, Long friendId) {
-        String sql = "SELECT * FROM films " +
-                "JOIN (SELECT film_id FROM likes WHERE user_id = ?) user_likes_1 ON films.id = user_likes_1.film_id " +
-                "JOIN (SELECT film_id FROM likes WHERE user_id = ?) user_likes_2 ON films.id = user_likes_2.film_id " +
+        String sql = MAIN_SELECT +
+                "JOIN (SELECT film_id FROM likes WHERE user_id = ?) user_likes1 ON films.id = user_likes1.film_id " +
+                "JOIN (SELECT film_id FROM likes WHERE user_id = ?) user_likes2 ON films.id = user_likes2.film_id " +
                 "JOIN (SELECT film_id, COUNT(user_id) AS like_count FROM likes GROUP BY film_id) like_counts " +
                 "ON films.id = like_counts.film_id " +
                 "ORDER BY like_counts.like_count DESC";
