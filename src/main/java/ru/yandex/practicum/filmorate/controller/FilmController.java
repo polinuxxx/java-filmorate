@@ -112,7 +112,7 @@ public class FilmController {
     public List<FilmResponse> getPopular(@RequestParam(defaultValue = "10") int count,
                                          @RequestParam(required = false) Integer genreId,
                                          @RequestParam(required = false) Integer year) {
-        return filmConverter.convert(filmService.getPopular(count,genreId,year));
+        return filmConverter.convert(filmService.getPopular(count, genreId, year));
     }
 
     /**
