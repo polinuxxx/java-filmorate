@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -81,8 +82,8 @@ public class FilmController {
      */
     @GetMapping("/popular")
     public List<Film> getPopular(@RequestParam(defaultValue = "10") int count,
-                                 @RequestParam(required = false) Optional<Integer> genreId,
-                                 @RequestParam(required = false) Optional<Integer> year) {
+                                 @RequestParam(required = false) Integer genreId,
+                                 @RequestParam(required = false) Integer year) {
         return filmService.getPopular(count,genreId,year);
     }
 

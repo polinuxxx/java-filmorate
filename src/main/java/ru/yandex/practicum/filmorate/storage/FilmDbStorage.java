@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -165,27 +166,6 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Film> getPopular(int count, Optional<Integer> genreId, Optional<Integer> year) {
-        String sql = MAIN_SELECT + "left join likes on films.id = likes.film_id " +
-                "where 1 = 1 ";
-        List<Object> params = new ArrayList<>();
-        if (genreId.isPresent()) {
-            sql += "and genres.id = ? ";
-            params.add(genreId.get());
-        }
-        if (year.isPresent()) {
-            sql += "and year(films.release_date) = ? ";
-            params.add(year.get());
-        }
-        sql += "group by films.id, genre_id order by count(likes.user_id) desc limit ?";
-        params.add(count);
-
-        Object[] paramsArray = params.toArray(new Object[0]);
-        return getCompleteFilmFromQuery(sql, paramsArray);
-    }
-
-    @Override
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         String sql;
 
@@ -202,6 +182,27 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         return getCompleteFilmFromQuery(sql, directorId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Film> getPopular(int count, Integer genreId, Integer year) {
+        String sql = MAIN_SELECT + "left join likes on films.id = likes.film_id " +
+                "where 1 = 1 ";
+        List<Object> params = new ArrayList<>();
+        if (genreId != null) {
+            sql += "and genres.id = ? ";
+            params.add(genreId);
+        }
+        if (year != null) {
+            sql += "and year(films.release_date) = ? ";
+            params.add(year);
+        }
+        sql += "group by films.id, genre_id order by count(likes.user_id) desc limit ?";
+        params.add(count);
+
+        Object[] paramsArray = params.toArray(new Object[0]);
+        return getCompleteFilmFromQuery(sql, paramsArray);
     }
 
     @Override

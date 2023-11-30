@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 import java.util.List;
+
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -122,13 +124,14 @@ public class FilmService {
         likeStorage.deleteLikeFromFilm(filmId, userId);
     }
 
-    public List<Film> getPopular(int count, Optional<Integer> genreId, Optional<Integer> year) {
-        StringBuilder logLineBuilder = new StringBuilder("Получение самых популярных фильмов по количеству лайков.");
-        genreId.ifPresent(id -> logLineBuilder.append(" Айди жанра - ").append(id).append("."));
-        year.ifPresent(y -> logLineBuilder.append(" Год выпуска фильма - ").append(y));
-        log.debug(logLineBuilder.toString());
-        return filmStorage.getPopular(count, genreId,year);
+    public List<Film> getPopular(int count, Integer genreId, Integer year) {
+        String logLineBuilder = "Получение самых популярных фильмов по количеству лайков." + " Айди жанра - "
+                + (genreId != null ? genreId : "не указано") + "." +
+                " Год выпуска фильма - " + (year != null ? year : "не указано");
+        log.debug(logLineBuilder);
+        return filmStorage.getPopular(count, genreId, year);
     }
+
 
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         log.debug("Получение списка фильмов по режисеру directorId={} с сортировкой по {}", directorId, sortBy);
