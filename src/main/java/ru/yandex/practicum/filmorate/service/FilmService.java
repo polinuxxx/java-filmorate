@@ -139,11 +139,14 @@ public class FilmService {
                 .build());
     }
 
-    public List<Film> getPopular(int count) {
-        log.debug("Получение {} самых популярных фильмов по количеству лайков", count);
-
-        return filmStorage.getPopular(count);
+    public List<Film> getPopular(int count, Integer genreId, Integer year) {
+        String logLineBuilder = "Получение самых популярных фильмов по количеству лайков." + " Айди жанра - "
+                + (genreId != null ? genreId : "не указано") + "." +
+                " Год выпуска фильма - " + (year != null ? year : "не указано");
+        log.debug(logLineBuilder);
+        return filmStorage.getPopular(count, genreId, year);
     }
+
 
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         log.debug("Получение списка фильмов по режиссеру directorId={} с сортировкой по {}", directorId, sortBy);

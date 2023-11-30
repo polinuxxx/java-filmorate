@@ -8,7 +8,7 @@ import java.util.List;
  */
 public interface FilmStorage extends Storage<Film> {
 
-    List<Film> getPopular(int count);
+    List<Film> getPopular(int count, Integer genreId, Integer year);
 
     List<Film> getFilmsByQueryAndType(String query, String by);
 

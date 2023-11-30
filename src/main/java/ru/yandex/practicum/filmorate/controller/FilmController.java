@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import javax.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.converter.FilmConverter;
@@ -103,12 +104,15 @@ public class FilmController {
     }
 
     /**
-     * Получение наиболее популярных фильмов по количеству лайков.
+     * Получение наиболее популярных фильмов по количеству лайков
+     * Опционально: в конкретном жанре или выпущенных в определенном году.
      */
     @GetMapping("/popular")
-    @Operation(summary = "Получение популярных фильмов, по умолчанию 10 шт.")
-    public List<FilmResponse> getPopular(@RequestParam(defaultValue = "10") int count) {
-        return filmConverter.convert(filmService.getPopular(count));
+    @Operation(summary = "Получение популярных фильмов ( опционально - по году и/или жанру) , по умолчанию 10 шт.")
+    public List<FilmResponse> getPopular(@RequestParam(defaultValue = "10") int count,
+                                         @RequestParam(required = false) Integer genreId,
+                                         @RequestParam(required = false) Integer year) {
+        return filmConverter.convert(filmService.getPopular(count, genreId, year));
     }
 
     /**
