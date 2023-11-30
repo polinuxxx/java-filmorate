@@ -10,11 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -183,7 +180,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Film> getPopular(int count) {
+    public List<Film> getPopular(int count, Integer genreId, Integer year) {
         String sql = MAIN_SELECT + "left join likes on films.id = likes.film_id "
                 + ", (select ID, count(likesOne.USER_ID) as cnt "
                 + "      from FILMS "
@@ -191,11 +188,24 @@ public class FilmDbStorage implements FilmStorage {
                 + "      group by id "
                 + "      order by cnt desc "
                 + "      limit ?) top "
-                + "where films.ID = top.id "
-                + "group by films.id, genre_id "
-                + "order by top.cnt desc, genre_id";
+                + "where 1 = 1 " +
+                (!Objects.isNull(genreId) ? "and films.ID IN (SELECT FILM_ID FROM FILM_GENRES WHERE GENRE_ID = ?) " : "") +
+                (!Objects.isNull(year) ? "and YEAR(FILMS.RELEASE_DATE) = ? " : "") +
+                "AND films.ID = top.id " +
+                "group by films.id, genre_id " +
+                "order by top.cnt desc, genre_id";
 
-        return getCompleteFilmFromQuery(sql, count);
+        List<Object> params = new ArrayList<>();
+        params.add(count);
+        if (!Objects.isNull(genreId)) {
+            params.add(genreId);
+        }
+        if (!Objects.isNull(year)) {
+            params.add(year);
+        }
+
+        Object[] paramsArray = params.toArray(new Object[0]);
+        return getCompleteFilmFromQuery(sql, paramsArray);
     }
 
     @Override
