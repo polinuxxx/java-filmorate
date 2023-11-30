@@ -2,14 +2,6 @@ package ru.yandex.practicum.filmorate.storage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.*;
 
 import lombok.RequiredArgsConstructor;
@@ -207,6 +199,7 @@ public class FilmDbStorage implements FilmStorage {
         Object[] paramsArray = params.toArray(new Object[0]);
         return getCompleteFilmFromQuery(sql, paramsArray);
     }
+
 
     @Override
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
