@@ -122,4 +122,13 @@ public class FilmController {
     public List<FilmResponse> getFilmsByDirector(@PathVariable Long directorId, @RequestParam String sortBy) {
         return filmConverter.convert(filmService.getFilmsByDirector(directorId, sortBy));
     }
+
+    /**
+     * Получение списка общих фильмов ( общий фильм - есть лайк от двух юзеров)
+     */
+    @GetMapping("/common")
+    @Operation(summary = "Получение списка общих фильмов")
+    public List<FilmResponse> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        return filmConverter.convert(filmService.getCommonFilms(userId, friendId));
+    }
 }

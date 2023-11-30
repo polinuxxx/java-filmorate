@@ -214,6 +214,18 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        String sql = MAIN_SELECT +
+                "JOIN (SELECT film_id FROM likes WHERE user_id = ?) user_likes1 ON films.id = user_likes1.film_id " +
+                "JOIN (SELECT film_id FROM likes WHERE user_id = ?) user_likes2 ON films.id = user_likes2.film_id " +
+                "JOIN (SELECT film_id, COUNT(user_id) AS like_count FROM likes GROUP BY film_id) like_counts " +
+                "ON films.id = like_counts.film_id " +
+                "ORDER BY like_counts.like_count DESC";
+        return getCompleteFilmFromQuery(sql, userId, friendId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public boolean exists(Long id) {
         String sql = "select case when count(id) > 0 then true else false end from films where id = ?";
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, id);
