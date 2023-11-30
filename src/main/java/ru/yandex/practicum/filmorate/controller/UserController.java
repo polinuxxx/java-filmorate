@@ -4,7 +4,8 @@ import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.dto.converter.FilmConverter;
+import ru.yandex.practicum.filmorate.dto.response.FilmResponse;
 import ru.yandex.practicum.filmorate.dto.converter.EventConverter;
 import ru.yandex.practicum.filmorate.dto.response.EventResponse;
 import ru.yandex.practicum.filmorate.model.User;
@@ -20,6 +21,7 @@ public class UserController {
 
     private final UserService userService;
     private final EventConverter eventConverter;
+    private final FilmConverter filmConverter;
 
     /**
      * Получение всех пользователей.
@@ -41,8 +43,8 @@ public class UserController {
      * Получение рекомендуемых фильмов.
      */
     @GetMapping("/{id}/recommendations")
-    public List<Film> getRecomendation(@PathVariable Long id) {
-        return userService.getRecommendationsFilms(id);
+    public List<FilmResponse> getRecomendation(@PathVariable Long id) {
+        return filmConverter.convert(userService.getRecommendationsFilms(id));
     }
 
     /**
