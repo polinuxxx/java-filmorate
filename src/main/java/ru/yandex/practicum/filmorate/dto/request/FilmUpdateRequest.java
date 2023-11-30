@@ -15,7 +15,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 @Schema(description = "Обновление фильма")
 public class FilmUpdateRequest extends FilmCreateRequest {
 
-    @JsonProperty("id")
     @NotNull(message = "Идентификатор фильма не может быть пустым")
     @Schema(description = "Идентификатор фильма", example = "1")
     private Long id;

@@ -6,10 +6,9 @@ import ru.yandex.practicum.filmorate.dto.request.DirectorCreateRequest;
 import ru.yandex.practicum.filmorate.dto.request.DirectorUpdateRequest;
 import ru.yandex.practicum.filmorate.dto.response.DirectorResponse;
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Genre;
 
 /**
- * Конвертер для {@link Genre}.
+ * Конвертер для {@link Director}.
  */
 @Mapper(componentModel = "spring")
 public interface DirectorConverter {
