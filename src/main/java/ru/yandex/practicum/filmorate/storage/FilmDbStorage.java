@@ -146,7 +146,7 @@ public class FilmDbStorage implements FilmStorage {
                 "join (select film_id, count(*) as like_count from likes group by film_id) lc " +
                 "on films.id = lc.film_id " +
                 "order by lc.like_count desc";
-        return getCompleteFilmFromQuery(sql, userId,friendId);
+        return getCompleteFilmFromQuery(sql, userId, friendId);
     }
 
     @Override

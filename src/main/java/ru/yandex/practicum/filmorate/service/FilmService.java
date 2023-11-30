@@ -157,7 +157,7 @@ public class FilmService {
         log.debug("Получение общих фильмов у пользователя {} и пользователя {}", userId, friendId);
         checkUserExists(userId);
         checkUserExists(friendId);
-        return filmStorage.getCommonFilms(userId,friendId);
+        return filmStorage.getCommonFilms(userId, friendId);
     }
 
     public void exists(Long id) {

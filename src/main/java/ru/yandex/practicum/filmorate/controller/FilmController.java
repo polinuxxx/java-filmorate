@@ -109,7 +109,7 @@ public class FilmController {
      * Получение списка общих фильмов ( общий фильм - есть лайк от двух юзеров)
      */
     @GetMapping("/common")
-    public List<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId){
-        return filmService.getCommonFilms(userId,friendId);
+    public List<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        return filmService.getCommonFilms(userId, friendId);
     }
 }
