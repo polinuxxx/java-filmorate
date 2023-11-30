@@ -24,4 +24,13 @@ public class LikeDbStorage {
     public void deleteLikeFromFilm(Long filmId, Long userId) {
         jdbcTemplate.update("delete from likes where film_id = ? and user_id = ?", filmId, userId);
     }
+
+    @Transactional(readOnly = true)
+    public boolean exists(Long filmId, Long userId) {
+        String sql = "select case when count(film_id) > 0 then true else false end " +
+                "from likes where film_id = ? and user_id = ?";
+        Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, filmId, userId);
+
+        return exists != null && exists;
+    }
 }
