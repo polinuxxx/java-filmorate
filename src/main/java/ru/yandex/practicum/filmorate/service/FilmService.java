@@ -163,6 +163,14 @@ public class FilmService {
         return filmStorage.getFilmsByDirector(directorId, sortBy);
     }
 
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        log.debug("Получение общих фильмов у пользователя {} и пользователя {}", userId, friendId);
+        checkUserExists(userId);
+        checkUserExists(friendId);
+
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
+
     public void exists(Long id) {
         log.debug("Проверка фильма на существование");
 
