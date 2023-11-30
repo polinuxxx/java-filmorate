@@ -17,14 +17,6 @@ import ru.yandex.practicum.filmorate.model.event.Operation;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.List;
-import ru.yandex.practicum.filmorate.storage.DirectorDbStorage;
-import ru.yandex.practicum.filmorate.storage.FilmDirectorDbStorage;
-import ru.yandex.practicum.filmorate.storage.FilmGenreDbStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.LikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.RatingMpaStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 /**
  * Сервис для {@link Film}.
