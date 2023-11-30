@@ -179,8 +179,16 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     @Transactional(readOnly = true)
     public List<Film> getPopular(int count) {
-        String sql = MAIN_SELECT + "left join likes on films.id = likes.film_id " +
-                "group by films.id, genre_id order by count(likes.user_id) desc limit ?";
+        String sql = MAIN_SELECT + "left join likes on films.id = likes.film_id "
+                + ", (select ID, count(likesOne.USER_ID) as cnt "
+                + "      from FILMS "
+                + "               left join likes likesOne on likesOne.FILM_ID = FILMS.ID "
+                + "      group by id "
+                + "      order by cnt desc "
+                + "      limit ?) top "
+                + "where films.ID = top.id "
+                + "group by films.id, genre_id "
+                + "order by top.cnt desc, genre_id";
 
         return getCompleteFilmFromQuery(sql, count);
     }
