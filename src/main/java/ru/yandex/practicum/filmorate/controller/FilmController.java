@@ -108,10 +108,11 @@ public class FilmController {
      * Опционально: в конкретном жанре или выпущенных в определенном году.
      */
     @GetMapping("/popular")
-    public List<Film> getPopular(@RequestParam(defaultValue = "10") int count,
-                                 @RequestParam(required = false) Integer genreId,
-                                 @RequestParam(required = false) Integer year) {
-        return filmService.getPopular(count,genreId,year);
+    @Operation(summary = "Получение популярных фильмов ( опционально - по году и/или жанру) , по умолчанию 10 шт.")
+    public List<FilmResponse> getPopular(@RequestParam(defaultValue = "10") int count,
+                                         @RequestParam(required = false) Integer genreId,
+                                         @RequestParam(required = false) Integer year) {
+        return filmConverter.convert(filmService.getPopular(count,genreId,year));
     }
 
     /**
