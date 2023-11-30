@@ -112,10 +112,10 @@ public class FilmController {
     }
 
     /**
-     * Получение списка фильмов по режисеру, с сортировкой
-     * @param directorId
-     * @param sortBy
-     * @return
+     * Получение списка фильмов по режиссеру, с сортировкой
+     * @param directorId идентификатор режиссера
+     * @param sortBy тип сортировки
+     * @return список фильмов
      */
     @GetMapping("/director/{directorId}")
     @Operation(summary = "Получение фильмов по id режиссера")
