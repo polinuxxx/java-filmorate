@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.dto.converter;
 
 import java.util.List;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import ru.yandex.practicum.filmorate.dto.request.FilmCreateRequest;
 import ru.yandex.practicum.filmorate.dto.request.FilmUpdateRequest;
 import ru.yandex.practicum.filmorate.dto.response.FilmResponse;
