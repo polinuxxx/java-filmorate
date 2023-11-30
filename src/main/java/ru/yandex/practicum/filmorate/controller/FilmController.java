@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import javax.validation.Valid;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.converter.FilmConverter;
@@ -12,6 +13,10 @@ import ru.yandex.practicum.filmorate.dto.request.FilmUpdateRequest;
 import ru.yandex.practicum.filmorate.dto.response.FilmResponse;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Контроллер для {@link Film}.
@@ -103,12 +108,14 @@ public class FilmController {
     }
 
     /**
-     * Получение наиболее популярных фильмов по количеству лайков.
+     * Получение наиболее популярных фильмов по количеству лайков
+     * Опционально: в конкретном жанре или выпущенных в определенном году.
      */
     @GetMapping("/popular")
-    @Operation(summary = "Получение популярных фильмов, по умолчанию 10 шт.")
-    public List<FilmResponse> getPopular(@RequestParam(defaultValue = "10") int count) {
-        return filmConverter.convert(filmService.getPopular(count));
+    public List<Film> getPopular(@RequestParam(defaultValue = "10") int count,
+                                 @RequestParam(required = false) Integer genreId,
+                                 @RequestParam(required = false) Integer year) {
+        return filmService.getPopular(count,genreId,year);
     }
 
     /**
