@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import java.util.List;
 
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,12 +17,6 @@ import ru.yandex.practicum.filmorate.model.event.Event;
 import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.model.event.Operation;
 import ru.yandex.practicum.filmorate.storage.*;
-
-import java.util.List;
-import ru.yandex.practicum.filmorate.storage.*;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Сервис для {@link Film}.
