@@ -19,14 +19,14 @@ ER-diagram for java-filmorate project.
 
 ## features
 
-- [x] https://github.com/users/polinuxxx/projects/2/views/1?pane=issue&itemId=45755534 @romilMasnaviev
-- [x] https://github.com/users/polinuxxx/projects/2/views/1?pane=issue&itemId=45755535 @dmiheev
-- [x] https://github.com/users/polinuxxx/projects/2/views/1?pane=issue&itemId=45755536 @PavelIgK @polinuxxx 
-- [x] https://github.com/users/polinuxxx/projects/2/views/1?pane=issue&itemId=45755538 @yelgazin
-- [x] https://github.com/users/polinuxxx/projects/2/views/1?pane=issue&itemId=45755539 @PavelIgK
-- [x] https://github.com/users/polinuxxx/projects/2/views/1?pane=issue&itemId=45755540 @romilMasnaviev
-- [x] https://github.com/users/polinuxxx/projects/2/views/1?pane=issue&itemId=45755541 @PavelIgK
-- [x] https://github.com/users/polinuxxx/projects/2/views/1?pane=issue&itemId=45755542 @polinuxxx
+- [x] https://github.com/polinuxxx/java-filmorate/issues/26 @polinuxxx
+- [x] https://github.com/polinuxxx/java-filmorate/issues/28 @dmiheev
+- [x] https://github.com/polinuxxx/java-filmorate/issues/29 @PavelIgK
+- [x] https://github.com/polinuxxx/java-filmorate/issues/30 @yelgazin
+- [x] https://github.com/polinuxxx/java-filmorate/issues/31 @PavelIgK @polinuxxx
+- [x] https://github.com/polinuxxx/java-filmorate/issues/32 @romilMasnaviev
+- [x] https://github.com/polinuxxx/java-filmorate/issues/33 @romilMasnaviev
+- [x] https://github.com/polinuxxx/java-filmorate/issues/34 @PavelIgK
 
 ## query examples
 ### getting film likes
