@@ -2,8 +2,12 @@
 
 ![ER-diagram](src/main/resources/db/er-diagram.png)
 
-## description
 ER-diagram for java-filmorate project.
+
+## description
+Java-filmorate application allows users to rate films, 
+leave reviews and give feedback on them, 
+friend members and watch news feed
 
 ## team
 ### team leader :muscle:
