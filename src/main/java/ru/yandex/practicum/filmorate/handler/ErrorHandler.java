@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exception.EntityAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ParamNotExistException;
+import ru.yandex.practicum.filmorate.exception.SearchQueryException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
@@ -42,6 +44,20 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleEntityAlreadyExistsException(final EntityAlreadyExistsException exception) {
         log.error("Ошибка повторного создания уже существующей сущности. {}", exception.getMessage());
+        return new ErrorResponse(exception.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse paramNotExistException(final ParamNotExistException exception) {
+        log.error("Ошибка входящих параметров. {}", exception.getMessage());
+        return new ErrorResponse(exception.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse searchQueryException(final SearchQueryException exception) {
+        log.error("Ошибка в запросе для поиска. {}", exception.getMessage());
         return new ErrorResponse(exception.getMessage());
     }
 

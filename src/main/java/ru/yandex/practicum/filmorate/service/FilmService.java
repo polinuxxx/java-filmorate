@@ -1,20 +1,22 @@
 package ru.yandex.practicum.filmorate.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ParamNotExistException;
+import ru.yandex.practicum.filmorate.exception.SearchQueryException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmGenreDbStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.LikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.RatingMpaStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.event.Event;
+import ru.yandex.practicum.filmorate.model.event.EventType;
+import ru.yandex.practicum.filmorate.model.event.Operation;
+import ru.yandex.practicum.filmorate.storage.*;
+
+import java.util.List;
 
 /**
  * Сервис для {@link Film}.
@@ -31,12 +33,18 @@ public class FilmService {
 
     private final GenreStorage genreStorage;
 
+    private final DirectorDbStorage directorDbStorage;
+
     @Qualifier("userDbStorage")
     private final UserStorage userStorage;
 
     private final RatingMpaStorage ratingMpaStorage;
 
     private final FilmGenreDbStorage filmGenreStorage;
+
+    private final FilmDirectorDbStorage filmDirectorDbStorage;
+
+    private final EventService eventService;
 
     public List<Film> getAll() {
         List<Film> films = filmStorage.getAll();
@@ -65,6 +73,10 @@ public class FilmService {
             filmGenreStorage.addGenresToFilm(createdFilm.getId(), film.getGenres());
         }
 
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+            filmDirectorDbStorage.addDirectorToFilm(createdFilm.getId(), film.getDirectors());
+        }
+
         return getById(createdFilm.getId());
     }
 
@@ -77,6 +89,11 @@ public class FilmService {
         filmGenreStorage.deleteGenresFromFilm(film.getId());
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             filmGenreStorage.addGenresToFilm(film.getId(), film.getGenres());
+        }
+
+        filmDirectorDbStorage.deleteDirectorsFromFilm(film.getId());
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+            filmDirectorDbStorage.addDirectorToFilm(film.getId(), film.getDirectors());
         }
 
         return filmStorage.update(film);
@@ -97,6 +114,13 @@ public class FilmService {
         checkUserExists(userId);
 
         likeStorage.addLikeToFilm(filmId, userId);
+        User user = userStorage.getById(userId);
+        eventService.add(Event.builder()
+                .user(user)
+                .type(EventType.LIKE)
+                .operation(Operation.ADD)
+                .entityId(filmId)
+                .build());
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -106,12 +130,38 @@ public class FilmService {
         checkUserExists(userId);
 
         likeStorage.deleteLikeFromFilm(filmId, userId);
+        User user = userStorage.getById(userId);
+        eventService.add(Event.builder()
+                .user(user)
+                .type(EventType.LIKE)
+                .operation(Operation.REMOVE)
+                .entityId(filmId)
+                .build());
     }
 
-    public List<Film> getPopular(int count) {
-        log.debug("Получение {} самых популярных фильмов по количеству лайков", count);
+    public List<Film> getPopular(int count, Integer genreId, Integer year) {
+        String logLineBuilder = "Получение самых популярных фильмов по количеству лайков." + " Айди жанра - "
+                + (genreId != null ? genreId : "не указано") + "." +
+                " Год выпуска фильма - " + (year != null ? year : "не указано");
+        log.debug(logLineBuilder);
+        return filmStorage.getPopular(count, genreId, year);
+    }
 
-        return filmStorage.getPopular(count);
+
+    public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
+        log.debug("Получение списка фильмов по режиссеру directorId={} с сортировкой по {}", directorId, sortBy);
+
+        checkDirectorExists(directorId);
+
+        return filmStorage.getFilmsByDirector(directorId, sortBy);
+    }
+
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        log.debug("Получение общих фильмов у пользователя {} и пользователя {}", userId, friendId);
+        checkUserExists(userId);
+        checkUserExists(friendId);
+
+        return filmStorage.getCommonFilms(userId, friendId);
     }
 
     public void exists(Long id) {
@@ -122,6 +172,20 @@ public class FilmService {
         }
     }
 
+    public List<Film> searchByQueryAndType(String query, String by) {
+        log.debug("Поиск фильма. Запрос на поиск: {}. Поля для поиска: {} ", query, by);
+
+        if (by == null || by.isBlank()) {
+            throw new ParamNotExistException("Пустой фильтра поиска. Параметр by должен содержать тип поиска.");
+        }
+
+        if (query == null || query.isBlank()) {
+            throw new SearchQueryException("Пустая строка для поиска. Параметр query должен быть заполнен.");
+        }
+
+        return filmStorage.getFilmsByQueryAndType(query, by);
+    }
+
     private void validate(Film film) {
         if (film == null) {
             throw new ValidationException("Передан пустой объект фильма.");
@@ -129,12 +193,19 @@ public class FilmService {
 
         exists(film.getId());
         film.getGenres().forEach(genre -> checkGenreExists(genre.getId()));
+        film.getDirectors().forEach(director -> checkDirectorExists(director.getId()));
         checkMpaExists(film.getMpa().getId());
     }
 
     private void checkGenreExists(Long genreId) {
         if (genreId != null && !genreStorage.exists(genreId)) {
             throw new EntityNotFoundException(String.format("Не найден жанр по id = %d.", genreId));
+        }
+    }
+
+    private void checkDirectorExists(Long directorId) {
+        if (directorId != null && !directorDbStorage.exists(directorId)) {
+            throw new EntityNotFoundException(String.format("Не найден режиссер по id = %d.", directorId));
         }
     }
 

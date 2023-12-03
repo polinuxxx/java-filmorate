@@ -1,15 +1,21 @@
 package ru.yandex.practicum.filmorate.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.EntityNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.event.Event;
+import ru.yandex.practicum.filmorate.model.event.EventType;
+import ru.yandex.practicum.filmorate.model.event.Operation;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.FriendDbStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+
+import java.util.List;
 
 /**
  * Сервис для {@link User}.
@@ -22,7 +28,12 @@ public class UserService {
     @Qualifier("userDbStorage")
     private final UserStorage userStorage;
 
+    @Qualifier("filmDbStorage")
+    private final FilmStorage filmStorage;
+
     private final FriendDbStorage friendStorage;
+
+    private final EventService eventService;
 
     public List<User> getAll() {
         List<User> users = userStorage.getAll();
@@ -37,6 +48,20 @@ public class UserService {
         exists(id);
 
         return userStorage.getById(id);
+    }
+
+    /**
+     * Получаем список рекомендуемых фильмов.
+     *
+     * @param id пользователя.
+     * @return список фильмов.
+     */
+    public List<Film> getRecommendationsFilms(Long id) {
+        log.debug("Получение рекомендации для пользователя с id = {}", id);
+
+        exists(id);
+
+        return filmStorage.getRecommendationFilms(id);
     }
 
     public User create(User user) {
@@ -70,6 +95,13 @@ public class UserService {
         exists(friendId);
 
         friendStorage.addFriendToUser(userId, friendId);
+        User user = userStorage.getById(userId);
+        eventService.add(Event.builder()
+                .user(user)
+                .type(EventType.FRIEND)
+                .operation(Operation.ADD)
+                .entityId(friendId)
+                .build());
     }
 
     public void deleteFriend(Long userId, Long friendId) {
@@ -79,6 +111,13 @@ public class UserService {
         exists(friendId);
 
         friendStorage.deleteFriendFromUser(userId, friendId);
+        User user = userStorage.getById(userId);
+        eventService.add(Event.builder()
+                .user(user)
+                .type(EventType.FRIEND)
+                .operation(Operation.REMOVE)
+                .entityId(friendId)
+                .build());
     }
 
     public List<User> getFriends(Long id) {
@@ -104,6 +143,14 @@ public class UserService {
         if (id != null && !userStorage.exists(id)) {
             throw new EntityNotFoundException(String.format("Не найден пользователь по id = %d.", id));
         }
+    }
+
+    public List<Event> getFeed(Long userId, int count) {
+        log.debug("Получение последних событий друзей пользователя с id = {} и лимитом в {} записей", userId, count);
+
+        exists(userId);
+
+        return eventService.getEventsByUserid(userId, count);
     }
 
     private void validate(User user) {

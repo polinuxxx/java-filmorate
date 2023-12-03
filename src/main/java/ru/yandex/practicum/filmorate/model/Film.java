@@ -1,21 +1,18 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 /**
  * Фильм.
@@ -38,7 +35,11 @@ public class Film extends AbstractEntity {
     @Positive(message = "Продолжительность должна быть положительной")
     private Integer duration;
 
+    @Builder.Default
     private Set<Genre> genres = new HashSet<>();
+
+    @Builder.Default
+    private Set<Director> directors = new HashSet<>();
 
     @NotNull(message = "Рейтинг MPA не может быть пустой")
     private RatingMpa mpa;
