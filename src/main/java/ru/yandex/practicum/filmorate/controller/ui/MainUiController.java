@@ -11,7 +11,7 @@ import ru.yandex.practicum.filmorate.dto.response.FilmResponse;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/")
+@RequestMapping("/ui/")
 public class MainUiController {
 
     private final FilmController filmController;
@@ -20,7 +20,7 @@ public class MainUiController {
     public String getAllFilms(Model model) {
         List<FilmResponse> filmControllerAll = filmController.getAll();
         model.addAttribute("films", filmControllerAll);
-        return "main";
+        return "/ui/main";
     }
 
 

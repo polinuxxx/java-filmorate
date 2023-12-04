@@ -70,6 +70,8 @@ create table if not exists USERS
     ID            BIGINT auto_increment,
     EMAIL         CHARACTER VARYING(255) not null,
     LOGIN         CHARACTER VARYING(200) not null,
+    PASSWORD      CHARACTER VARYING(200) not null,
+    ENABLED       BOOL not null,
     NAME          CHARACTER VARYING(255),
     BIRTHDAY      DATE,
     constraint USER_PK
@@ -146,6 +148,18 @@ create table if not exists REVIEW_LIKES
         foreign key (REVIEW_ID) references REVIEWS
             on delete cascade,
     constraint "REVIEW_LIKES_USERS_ID_fk"
+        foreign key (USER_ID) references USERS
+            on delete cascade
+);
+
+create table if not exists AUTHORITIES
+(
+    ID uuid not null default RANDOM_UUID(),
+    USER_ID  BIGINT not null,
+    AUTHORITY CHARACTER VARYING not null,
+    constraint LOGIN_AUTHORITY_PK
+        primary key (ID),
+    constraint "AUTHORITIES_LOGIN_fk"
         foreign key (USER_ID) references USERS
             on delete cascade
 );

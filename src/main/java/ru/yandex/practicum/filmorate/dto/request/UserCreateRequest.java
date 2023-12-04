@@ -29,6 +29,9 @@ public class UserCreateRequest {
     @Schema(description = "Логин", example = "user")
     private String login;
 
+    @Schema(description = "Логин", example = "user")
+    private String password;
+
     @Setter(AccessLevel.NONE)
     @Schema(description = "Имя", example = "Иван")
     private String name;

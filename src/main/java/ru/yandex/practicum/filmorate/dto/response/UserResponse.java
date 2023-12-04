@@ -23,6 +23,9 @@ public class UserResponse {
     @Schema(description = "Логин", example = "user")
     private String login;
 
+    @Schema(description = "Пароль", example = "user")
+    private String password;
+
     @Schema(description = "Имя", example = "Иван")
     private String name;
 

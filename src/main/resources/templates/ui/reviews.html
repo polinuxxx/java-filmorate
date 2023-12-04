@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
-<head th:replace="~{/fragments/layouts :: header}">
+<head th:replace="~{ui/fragments/layouts :: header}">
   <title id="pageTitle">Отзывы о фильме</title>
 </head>
 <body>
-<div th:replace="~{/fragments/layouts :: menu}"></div>
+<div th:replace="~{ui/fragments/layouts :: menu}"></div>
 <h2 class="text-center" th:text="'Отзывы о фильме ' + ${film.getName()}"></h2>
 
 

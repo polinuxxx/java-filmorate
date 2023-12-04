@@ -3,11 +3,13 @@ package ru.yandex.practicum.filmorate.storage;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.filmorate.model.Authority;
 import ru.yandex.practicum.filmorate.model.User;
 
 /**
@@ -46,6 +48,18 @@ public class UserDbStorage implements UserStorage {
                 .usingGeneratedKeyColumns("id");
 
         item.setId(simpleJdbcInsert.executeAndReturnKey(item.toMap()).longValue());
+
+        Authority authority = Authority.builder()
+                .id(UUID.randomUUID())
+                .authority("CLIENT")
+                .user_id(item.getId())
+                .build();
+
+        SimpleJdbcInsert authorityJbdcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("authorities");
+
+        authorityJbdcInsert.execute(authority.toMap());
+
 
         return getById(item.getId());
     }
