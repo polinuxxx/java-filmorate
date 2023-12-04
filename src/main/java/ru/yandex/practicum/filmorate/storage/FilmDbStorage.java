@@ -34,7 +34,6 @@ public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-
     @Override
     @Transactional(readOnly = true)
     public Film getById(Long id) {
@@ -106,16 +105,6 @@ public class FilmDbStorage implements FilmStorage {
     @Transactional(readOnly = true)
     public List<Film> getRecommendationFilms(Long userId) {
 
-        /*
-        -- Собираем таблицу пользователей с похожими предпочтениями с частотой совпадений
-        -- USER1_ID - ключевой пользователь
-        -- USER2_ID - похожий пользователь
-        -- CNT - частота совпадений предпочтений
-
-        -- Склеиваем похожих пользователей с фильмами
-        -- Исключаем фильмы с отметками ключевого пользователя
-        */
-
         String recommendedFilmIdsQuery = "SELECT likesThree.FILM_ID " +
                 "FROM (SELECT likesOne.USER_ID AS USER1_ID, likesTwo.USER_ID AS USER2_ID, COUNT(*) AS CNT " +
                 "      FROM LIKES likesOne " +
@@ -140,7 +129,7 @@ public class FilmDbStorage implements FilmStorage {
                 .withTableName("films")
                 .usingGeneratedKeyColumns("id");
 
-        Long filmId = simpleJdbcInsert.executeAndReturnKey(item.toMap()).longValue();
+        Long filmId = simpleJdbcInsert.executeAndReturnKey(toMap(item)).longValue();
 
         return getById(filmId);
     }
@@ -200,7 +189,6 @@ public class FilmDbStorage implements FilmStorage {
         return getCompleteFilmFromQuery(sql, paramsArray);
     }
 
-
     @Override
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         String sql;
@@ -235,7 +223,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     @Transactional(readOnly = true)
     public boolean exists(Long id) {
-        String sql = "select case when count(id) > 0 then true else false end from films where id = ?";
+        String sql = "select exists(select id from films where id = ?)";
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, id);
 
         return exists != null && exists;
@@ -308,5 +296,17 @@ public class FilmDbStorage implements FilmStorage {
                     return map.isEmpty() ? new ArrayList<>() : new ArrayList<>(map.values());
                 }, params
         );
+    }
+
+    private Map<String, Object> toMap(Film film) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("id", film.getId());
+        values.put("name", film.getName());
+        values.put("description", film.getDescription());
+        values.put("release_date", film.getReleaseDate());
+        values.put("duration_min", film.getDuration());
+        values.put("rating_mpa_id", film.getMpa().getId());
+
+        return values;
     }
 }

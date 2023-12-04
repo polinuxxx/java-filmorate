@@ -60,8 +60,8 @@ public class FriendDbStorage {
 
     @Transactional(readOnly = true)
     public boolean exists(Long userId, Long friendId) {
-        String sql = "select case when count(user_id) > 0 then true else false end " +
-                "from friends where user_id = ? and friend_id = ?";
+        String sql = "select exists(select user_id from friends where user_id = ? and friend_id = ?)";
+
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, userId, friendId);
 
         return exists != null && exists;

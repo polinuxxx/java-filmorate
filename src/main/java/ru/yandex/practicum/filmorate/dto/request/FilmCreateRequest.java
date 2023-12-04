@@ -11,7 +11,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import ru.yandex.practicum.filmorate.model.Director;
@@ -43,11 +42,9 @@ public class FilmCreateRequest {
     @Schema(description = "Продолжительность фильма в минутах", example = "300")
     private Integer duration;
 
-    @Builder.Default
     @Schema(description = "Жанры")
     private Set<Genre> genres = new HashSet<>();
 
-    @Builder.Default
     @Schema(description = "Режиссеры")
     private Set<Director> directors = new HashSet<>();
 

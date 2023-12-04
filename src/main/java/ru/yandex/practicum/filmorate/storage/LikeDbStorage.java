@@ -27,8 +27,8 @@ public class LikeDbStorage {
 
     @Transactional(readOnly = true)
     public boolean exists(Long filmId, Long userId) {
-        String sql = "select case when count(film_id) > 0 then true else false end " +
-                "from likes where film_id = ? and user_id = ?";
+        String sql = "select exists(select film_id from likes where film_id = ? and user_id = ?)";
+
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, filmId, userId);
 
         return exists != null && exists;
