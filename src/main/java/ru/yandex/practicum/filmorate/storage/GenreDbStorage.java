@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.storage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -24,9 +26,7 @@ public class GenreDbStorage implements GenreStorage {
     public Genre getById(Long id) {
         String sql = MAIN_SELECT + "where id = ?";
 
-        List<Genre> genres = jdbcTemplate.query(sql, GenreDbStorage::toGenre, id);
-
-        return genres.get(0);
+        return jdbcTemplate.queryForObject(sql, GenreDbStorage::toGenre, id);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     @Transactional(readOnly = true)
     public boolean exists(Long id) {
-        String sql = "select case when count(id) > 0 then true else false end from genres where id = ?";
+        String sql = "select exists(select id from genres where id = ?)";
 
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, id);
 
@@ -67,5 +67,13 @@ public class GenreDbStorage implements GenreStorage {
                 .id(rs.getLong("id"))
                 .name(rs.getString("name"))
                 .build();
+    }
+
+    private Map<String, Object> toMap(Genre genre) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("id", genre.getId());
+        values.put("name", genre.getName());
+
+        return values;
     }
 }
