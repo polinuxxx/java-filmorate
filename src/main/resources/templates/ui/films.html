@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head th:replace="~{/fragments/layouts :: header}">
+  <title id="pageTitle">Список фильмов</title>
+</head>
+<body>
+<div th:replace="~{/fragments/layouts :: menu}"></div>
+<h2 class="text-center">Список фильмов</h2>
+<hr>
+<br>
+<div th:fragment="films" class="album py-5 bg-body-tertiary">
+  <div class="container">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+      <div th:each="film: ${films}" class="col" >
+        <div class="card shadow-sm">
+          <div class="col p-4 d-flex flex-column position-static">
+            <h3 class="mb-1" th:text="${film.getName()}"></h3>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="text-body-secondary"
+                   th:text="${#temporals.format(film.getReleaseDate(), 'dd MMMM yyyy', new java.util.Locale('ru', 'RU'))}"></div>
+              <div class="text-body-secondary">
+                <ul class="d-inline-flex">
+                  <li th:each="genre : ${film.getGenres()}" th:text="${genre.getName()}"
+                      class="nav-link px-1 text-secondary"></li>
+                </ul>
+              </div>
+            </div>
+            <p class="card-text" th:text="${film.getDuration() + ' мин.'}"></p>
+            <p class="card-text" th:text="${film.getDescription()}"></p>
+            <p class="card-text" th:text="${'Рейтинг: ' + film.getMpa().getName() + ''}"></p>
+
+            <div class="d-inline-flex">
+              <p class="card-text" th:text="${'Режиссер: '}"></p>
+              <ul class="d-inline-flex">
+                <li th:each="directors : ${film.getDirectors()}" th:text="${directors.getName()}"
+                    class="nav-link"></li>
+              </ul>
+            </div>
+
+            <div class="text-end">
+              <a th:href="@{/ui/reviews/?filmId={filmId}(filmId=${film.getId()})}"
+                 class="text-body-secondary">Отзывы</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
+
