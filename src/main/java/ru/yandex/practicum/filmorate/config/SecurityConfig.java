@@ -1,20 +1,19 @@
 package ru.yandex.practicum.filmorate.config;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Конфиг для аутентификации.
@@ -37,26 +36,42 @@ public class SecurityConfig {
         auth.jdbcAuthentication()
                 .dataSource(dataSource)
                 .usersByUsernameQuery(" select login, password, enabled "
-                        + " from public.users "
+                        + " from users "
                         + " where login = ? ")
                 .authoritiesByUsernameQuery("select users.login, authorities.authority "
                         + " from users "
-                        + " join authorities on users.id = authorities.user_id"
+                        + " left join authorities on users.id = authorities.user_id"
                         + " where users.login = ? ");
     }
 
+
     @SneakyThrows
     @Bean
-    SecurityFilterChain adminFilterChain(HttpSecurity http) {
+    public SecurityFilterChain filterChain(HttpSecurity http) {
 
-//        http.authorizeRequests()
-//                .antMatchers("/films/**", "/login").permitAll()
-//                .antMatchers("/ui/**").hasRole("CLIENT")
-//                .and()
-//                .formLogin(loginConfigurer -> loginConfigurer
-//                        .defaultSuccessUrl("/ui/"))
-//                .csrf().disable();
+        http
+                .csrf()
+                .disable()
+                .httpBasic(withDefaults())
+                .authorizeRequests()
+                //Доступ только для не зарегистрированных пользователей
+                .antMatchers("/registration").not().fullyAuthenticated()
+                //Доступ только для пользователей с Authority CLIENT
+                .antMatchers("/ui/**").hasAuthority("CLIENT")
+                //Доступ разрешен всем пользователям
+                .antMatchers("/**", "/resources/**").permitAll()
+                //Все остальные страницы требуют аутентификации
+                .anyRequest().authenticated()
+                .and()
+                //Настройка для входа в систему
+                .formLogin(loginConfigurer -> loginConfigurer
+                        .defaultSuccessUrl("/ui/").permitAll())
+                //Перенарпавление на главную страницу после успешного входа
+                .logout()
+                .permitAll()
+                .logoutSuccessUrl("/");
 
         return http.build();
     }
+
 }

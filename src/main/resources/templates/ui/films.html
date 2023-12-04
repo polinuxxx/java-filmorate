@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
 <head th:replace="~{ui/fragments/layouts :: header}">
   <title id="pageTitle">Список фильмов</title>
 </head>
@@ -41,12 +42,15 @@
               <a th:href="@{/ui/reviews/?filmId={filmId}(filmId=${film.getId()})}"
                  class="text-body-secondary">Отзывы</a>
             </div>
+            <div class="text-end">
+              <a th:href="@{/ui/review_create?filmId={filmId}(filmId=${film.getId()})}"
+                 class="text-body-secondary">Добавить отзыв</a>
+            </div>
           </div>
         </div>
       </div>
 
     </div>
-
   </div>
 </div>
 </body>

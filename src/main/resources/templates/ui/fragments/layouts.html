@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<html lang="en" xmlns:th="https://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
 <head th:fragment="header">
   <meta charset="UTF-8">
   <title th:replace="~{:: #pageTitle}">Layout Generic Title</title>
@@ -28,10 +29,20 @@
           <input type="hidden" class="form-control form-control-dark text-bg-dark" placeholder="Search..."
                  aria-label="Search" name="by" value="title,director">
         </form>
-
-        <div class="text-end">
-          <button type="button" class="btn btn-outline-light me-2">Login</button>
+        <div class="text-end" sec:authorize="isAuthenticated()">
+          <span class="text-end" sec:authentication="name"></span>
         </div>
+        <div class="text-end" sec:authorize="isAnonymous()">
+          <a href="/login">
+            <button type="button" class="btn btn-outline-light me-2">Login</button>
+          </a>
+        </div>
+        <div class="text-end" sec:authorize="isAuthenticated()">
+          <a href="/logout">
+            <button type="button" class="btn btn-outline-light me-2">Logout</button>
+          </a>
+        </div>
+
       </div>
     </div>
   </div>

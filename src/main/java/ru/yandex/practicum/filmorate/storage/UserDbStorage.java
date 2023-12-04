@@ -43,6 +43,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     @Transactional
     public User create(User item) {
+        item.setPassword("123");
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
