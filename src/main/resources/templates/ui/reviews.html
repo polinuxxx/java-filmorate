@@ -8,22 +8,36 @@
 <h2 class="text-center" th:text="'Отзывы о фильме ' + ${film.getName()}"></h2>
 
 
-  <div class="container">
-    <div class="px-4 text-center border-bottom">
-      <div th:each="review: ${reviews}" class="col">
-        <div class="card shadow-sm">
-          <div class="col p-4 d-flex flex-column position-static">
-            <p class="card-text" th:text="${review.getContent()}"></p>
-            <p class="card-text" th:text="${review.getIsPositive() ? 'Положительный отзыв' : 'Отрицательный отзыв'}"></p>
-            <p class="card-text" th:text="${'Полезность отзыва: ' + review.getUseful()}"></p>
-          </div>
-        </div>
-        <hr class="featurette-divider">
-      </div>
+<div class="container">
+  <div class="px-4 text-center border-bottom">
+    <div th:each="review: ${reviews}" class="col">
+      <div class="card shadow-sm">
+        <div class="col p-4 d-flex flex-column position-static">
 
+
+          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            <div class="col">
+              <p class="card-text" th:text="'Имя пользователя: ' + ${users.get(review.getUserId()).getName()}"></p>
+            </div>
+            <div class="col">
+              <p class="card-text" th:text="'Логин: ' + ${users.get(review.getUserId()).getLogin()}"></p>
+            </div>
+            <div class="col">
+              <p class="card-text" th:text="'Email: ' + ${users.get(review.getUserId()).getEmail()}"></p>
+            </div>
+          </div>
+          <hr class="featurette-divider">
+          <p class="card-text" th:text="${review.getContent()}"></p>
+          <p class="card-text" th:text="${review.getIsPositive() ? 'Положительный отзыв' : 'Отрицательный отзыв'}"></p>
+          <p class="card-text" th:text="${'Полезность отзыва: ' + review.getUseful()}"></p>
+        </div>
+      </div>
+      <hr class="featurette-divider">
     </div>
 
   </div>
+
+</div>
 
 </body>
 </html>
