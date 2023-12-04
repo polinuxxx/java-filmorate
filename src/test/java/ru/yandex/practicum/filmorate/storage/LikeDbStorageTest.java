@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Тесты для {@link LikeDbStorage}.
+ * Тесты для {@link FilmMarkDbStorage}.
  */
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -27,7 +27,7 @@ class LikeDbStorageTest {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private LikeDbStorage likeStorage;
+    private FilmMarkDbStorage likeStorage;
 
     private UserStorage userStorage;
 
@@ -39,7 +39,7 @@ class LikeDbStorageTest {
 
     @BeforeEach
     void setUp() {
-        likeStorage = new LikeDbStorage(jdbcTemplate);
+        likeStorage = new FilmMarkDbStorage(jdbcTemplate);
         userStorage = new UserDbStorage(jdbcTemplate);
         filmStorage = new FilmDbStorage(jdbcTemplate);
 

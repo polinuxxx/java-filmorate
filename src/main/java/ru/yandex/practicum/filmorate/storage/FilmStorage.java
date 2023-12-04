@@ -18,4 +18,5 @@ public interface FilmStorage extends Storage<Film> {
 
     List<Film> getCommonFilms(Long userId, Long friendId);
 
+    void recalculateRate(Long id);
 }

@@ -2,10 +2,9 @@ package ru.yandex.practicum.filmorate.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-import javax.validation.Valid;
-
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.Range;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.converter.FilmConverter;
 import ru.yandex.practicum.filmorate.dto.request.FilmCreateRequest;
@@ -14,12 +13,16 @@ import ru.yandex.practicum.filmorate.dto.response.FilmResponse;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
+import javax.validation.Valid;
+import java.util.List;
+
 /**
  * Контроллер для {@link Film}.
  */
 @RestController
 @RequestMapping("/films")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Films", description = "Управление фильмами")
 public class FilmController {
 
@@ -48,13 +51,13 @@ public class FilmController {
      * Поиск фильмов по строке поиска и заданным полям.
      *
      * @param query Строка запроса.
-     * @param by тип поиска через запятую. Возможные значения: director, title
+     * @param by    тип поиска через запятую. Возможные значения: director, title
      * @return Список фильмов.
      */
     @GetMapping("/search")
     @Operation(summary = "Поиск фильма по строке запроса, по полям наименование, режиссер или и там и там")
     public List<FilmResponse> searchByQueryAndType(@RequestParam("query") String query,
-            @RequestParam("by") String by) {
+                                                   @RequestParam("by") String by) {
         return filmConverter.convert(filmService.searchByQueryAndType(query, by));
     }
 
@@ -86,21 +89,30 @@ public class FilmController {
     }
 
     /**
-     * Добавление фильму лайка.
+     * Добавление фильму оценки.
+     *
+     * @param id идентификатор фильма
+     * @param userId идентификатор пользователя
+     * @param mark оценка от 1 до 10 включительно
      */
-    @PutMapping("/{id}/like/{userId}")
-    @Operation(summary = "Добавление лайка от пользователя к фильму")
-    public void addLike(@PathVariable Long id, @PathVariable Long userId) {
-        filmService.addLike(id, userId);
+    @PutMapping("/{id}/marks/{userId}/{mark}")
+    @Operation(summary = "Добавление оценки пользователя к фильму")
+    public void addLike(@PathVariable Long id,
+                        @PathVariable Long userId,
+                        @PathVariable @Range(min = 1, max = 10) Integer mark) {
+        filmService.addMark(id, userId, mark);
     }
 
     /**
-     * Удаление у фильма лайка.
+     * Удаление у фильма оценки.
+     *
+     * @param id идентификатор фильма
+     * @param userId идентификатор пользователя
      */
-    @DeleteMapping("/{id}/like/{userId}")
-    @Operation(summary = "Удаление лайка пользователя у фильма")
-    public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
-        filmService.deleteLike(id, userId);
+    @DeleteMapping("/{id}/marks/{userId}")
+    @Operation(summary = "Удаление у фильма оценки пользователя")
+    public void deleteMark(@PathVariable Long id, @PathVariable Long userId) {
+        filmService.deleteMark(id, userId);
     }
 
     /**
@@ -117,8 +129,9 @@ public class FilmController {
 
     /**
      * Получение списка фильмов по режиссеру, с сортировкой
+     *
      * @param directorId идентификатор режиссера
-     * @param sortBy тип сортировки
+     * @param sortBy     тип сортировки
      * @return список фильмов
      */
     @GetMapping("/director/{directorId}")
@@ -134,5 +147,23 @@ public class FilmController {
     @Operation(summary = "Получение списка общих фильмов")
     public List<FilmResponse> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
         return filmConverter.convert(filmService.getCommonFilms(userId, friendId));
+    }
+
+    /**
+     * Заглушка для теста. Добавление фильму лайка.
+     */
+    @PutMapping("/{id}/like/{userId}")
+    @Operation(summary = "Добавление лайка от пользователя к фильму")
+    public void addLike(@PathVariable Long id, @PathVariable Long userId) {
+        filmService.addMark(id, userId, 10);
+    }
+
+    /**
+     * Заглушка для теста. Удаление у фильма лайка.
+     */
+    @DeleteMapping("/{id}/like/{userId}")
+    @Operation(summary = "Удаление лайка пользователя у фильма")
+    public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
+        filmService.deleteMark(id, userId);
     }
 }

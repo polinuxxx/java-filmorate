@@ -33,7 +33,7 @@ class FilmDbStorageTest {
 
     private UserStorage userStorage;
 
-    private LikeDbStorage likeStorage;
+    private FilmMarkDbStorage likeStorage;
 
     private FilmGenreDbStorage filmGenreStorage;
 
@@ -49,7 +49,7 @@ class FilmDbStorageTest {
     void setUp() {
         filmStorage = new FilmDbStorage(jdbcTemplate);
         userStorage = new UserDbStorage(jdbcTemplate);
-        likeStorage = new LikeDbStorage(jdbcTemplate);
+        likeStorage = new FilmMarkDbStorage(jdbcTemplate);
         filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
 
         firstFilm = Film.builder()

@@ -15,6 +15,7 @@ create table if not exists FILMS
     RELEASE_DATE  DATE,
     DURATION_MIN  INTEGER,
     RATING_MPA_ID BIGINT,
+    RATE          DOUBLE not null default 0.00,
     constraint FILM_PK
         primary key (ID),
     constraint "FILM_RATING_MPA_ID_fk"
@@ -103,16 +104,17 @@ create table if not exists EVENTS
             on delete cascade
 );
 
-create table if not exists LIKES
+create table if not exists FILM_MARKS
 (
-    USER_ID BIGINT not null,
-    FILM_ID BIGINT not null,
-    constraint "LIKES_pk"
+    USER_ID BIGINT  not null,
+    FILM_ID BIGINT  not null,
+    MARK    INTEGER not null,
+    constraint "FILMS_MARKS_pk"
         primary key (USER_ID, FILM_ID),
-    constraint "LIKES_FILMS_ID_fk"
+    constraint "FILMS_MARKS_FILMS_ID_fk"
         foreign key (FILM_ID) references FILMS
             on delete cascade,
-    constraint "LIKES_USERS_ID_fk"
+    constraint "FILMS_MARKS_USERS_ID_fk"
         foreign key (USER_ID) references USERS
             on delete cascade
 );

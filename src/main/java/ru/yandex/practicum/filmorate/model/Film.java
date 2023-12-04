@@ -33,4 +33,7 @@ public class Film extends AbstractEntity {
     private Set<Director> directors = new HashSet<>();
 
     private RatingMpa mpa;
+
+    @Builder.Default
+    private Double rate = 0.0;
 }

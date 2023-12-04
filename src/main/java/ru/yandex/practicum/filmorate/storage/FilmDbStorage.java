@@ -22,7 +22,7 @@ import ru.yandex.practicum.filmorate.model.RatingMpa;
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private static final String MAIN_SELECT = "select films.id, films.name, films.description, films.duration_min, " +
-            "films.release_date, films.rating_mpa_id as mpa_id, mpa.name as mpa_name, mpa.description " +
+            "films.release_date, films.rate, films.rating_mpa_id as mpa_id, mpa.name as mpa_name, mpa.description " +
             "as mpa_description, genres.id as genre_id, genres.name as genre_name, " +
             "directors.id as director_id, directors.name as director_name " +
             "from films " +
@@ -64,7 +64,7 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> getFilmsByQueryAndType(String query, String by) {
 
         Set<String> bySet = new HashSet<>(Arrays.asList(by.split(",")));
-        String sql = MAIN_SELECT + "left join likes on films.id = likes.film_id ";
+        String sql = MAIN_SELECT + " ";
         ArrayList<String> listParams = new ArrayList<>();
         String byToQuery = "";
         Iterator<String> it = bySet.iterator();
@@ -89,7 +89,7 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         if (!byToQuery.isEmpty()) {
-            sql = sql + "where " + byToQuery + " group by films.id, genre_id order by count(likes.user_id) desc";
+            sql = sql + "where " + byToQuery + " order by films.rate desc";
         }
 
         return getCompleteFilmFromQuery(sql, listParams.toArray());
@@ -105,16 +105,17 @@ public class FilmDbStorage implements FilmStorage {
     @Transactional(readOnly = true)
     public List<Film> getRecommendationFilms(Long userId) {
 
-        String recommendedFilmIdsQuery = "SELECT likesThree.FILM_ID " +
-                "FROM (SELECT likesOne.USER_ID AS USER1_ID, likesTwo.USER_ID AS USER2_ID, COUNT(*) AS CNT " +
-                "      FROM LIKES likesOne " +
-                "               INNER JOIN LIKES likesTwo " +
-                "                          ON likesOne.FILM_ID = likesTwo.FILM_ID " +
-                "                              AND likesOne.USER_ID <> likesTwo.USER_ID AND likesOne.USER_ID = ? " +
-                "      GROUP BY likesTwo.USER_ID) AS near " +
-                "         INNER JOIN LIKES likesThree " +
-                "                    ON near.USER2_ID = likesThree.USER_ID " +
-                "WHERE likesThree.FILM_ID NOT IN (SELECT FILM_ID FROM LIKES WHERE USER_ID = near.USER1_ID) " +
+        String recommendedFilmIdsQuery = "SELECT marksThree.FILM_ID " +
+                "FROM (SELECT marksOne.USER_ID AS USER1_ID, marksTwo.USER_ID AS USER2_ID, COUNT(*) AS CNT " +
+                "      FROM FILM_MARKS marksOne " +
+                "               INNER JOIN FILM_MARKS marksTwo " +
+                "                          ON marksOne.FILM_ID = marksTwo.FILM_ID " +
+                "                             AND marksOne.MARK = marksTwo.MARK " +
+                "                             AND marksOne.USER_ID <> marksTwo.USER_ID AND marksOne.USER_ID = ? " +
+                "      GROUP BY marksTwo.USER_ID) AS near " +
+                "         INNER JOIN FILM_MARKS marksThree " +
+                "                    ON near.USER2_ID = marksThree.USER_ID " +
+                "WHERE marksThree.FILM_ID NOT IN (SELECT FILM_ID FROM FILM_MARKS WHERE USER_ID = near.USER1_ID) " +
                 "ORDER BY near.CNT DESC ";
 
         String sql = MAIN_SELECT + ", (" + recommendedFilmIdsQuery + ") as top where top.FILM_ID = films.ID order by genre_id";
@@ -162,28 +163,21 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     @Transactional(readOnly = true)
     public List<Film> getPopular(int count, Integer genreId, Integer year) {
-        String sql = MAIN_SELECT + "left join likes on films.id = likes.film_id "
-                + ", (select ID, count(likesOne.USER_ID) as cnt "
-                + "      from FILMS "
-                + "               left join likes likesOne on likesOne.FILM_ID = FILMS.ID "
-                + "      group by id "
-                + "      order by cnt desc "
-                + "      limit ?) top "
-                + "where 1 = 1 " +
+        String sql = MAIN_SELECT +
+                "where 1 = 1 " +
                 (!Objects.isNull(genreId) ? "and films.ID IN (SELECT FILM_ID FROM FILM_GENRES WHERE GENRE_ID = ?) " : "") +
                 (!Objects.isNull(year) ? "and YEAR(FILMS.RELEASE_DATE) = ? " : "") +
-                "AND films.ID = top.id " +
-                "group by films.id, genre_id " +
-                "order by top.cnt desc, genre_id";
+                "order by rate desc, genre_id " +
+                "limit ?";
 
         List<Object> params = new ArrayList<>();
-        params.add(count);
         if (!Objects.isNull(genreId)) {
             params.add(genreId);
         }
         if (!Objects.isNull(year)) {
             params.add(year);
         }
+        params.add(count);
 
         Object[] paramsArray = params.toArray(new Object[0]);
         return getCompleteFilmFromQuery(sql, paramsArray);
@@ -194,13 +188,13 @@ public class FilmDbStorage implements FilmStorage {
         String sql;
 
         if (sortBy.equals("likes")) {
-            sql = MAIN_SELECT + "left join likes on films.id = likes.film_id " +
+            sql = MAIN_SELECT + " " +
                     "where directors.id = ? " +
-                    "group by films.id, genre_id order by count(likes.user_id) desc, genre_id";
+                    "order by films.rate desc, genre_id";
         } else if (sortBy.equals("year")) {
-            sql = MAIN_SELECT + "left join likes on films.id = likes.film_id " +
+            sql = MAIN_SELECT + " " +
                     "where directors.id = ? " +
-                    "group by films.id, genre_id order by release_date, genre_id";
+                    "order by release_date, genre_id";
         } else {
             throw new IllegalArgumentException("Неподдерживаемый параметр упорядочивания фильмов.");
         }
@@ -212,11 +206,9 @@ public class FilmDbStorage implements FilmStorage {
     @Transactional(readOnly = true)
     public List<Film> getCommonFilms(Long userId, Long friendId) {
         String sql = MAIN_SELECT +
-                "JOIN (SELECT film_id FROM likes WHERE user_id = ?) user_likes1 ON films.id = user_likes1.film_id " +
-                "JOIN (SELECT film_id FROM likes WHERE user_id = ?) user_likes2 ON films.id = user_likes2.film_id " +
-                "JOIN (SELECT film_id, COUNT(user_id) AS like_count FROM likes GROUP BY film_id) like_counts " +
-                "ON films.id = like_counts.film_id " +
-                "ORDER BY like_counts.like_count DESC";
+                "JOIN (SELECT film_id FROM film_marks WHERE user_id = ?) marksOne ON films.id = marksOne.film_id " +
+                "JOIN (SELECT film_id FROM film_marks WHERE user_id = ?) marksTwo ON films.id = marksTwo.film_id " +
+                "ORDER BY films.rate DESC";
         return getCompleteFilmFromQuery(sql, userId, friendId);
     }
 
@@ -227,6 +219,16 @@ public class FilmDbStorage implements FilmStorage {
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, id);
 
         return exists != null && exists;
+    }
+
+    @Override
+    @Transactional
+    public void recalculateRate(Long id) {
+        String sql = "update films set rate = " +
+                "(select coalesce(avg(marks.mark), 0.00) from film_marks as marks where marks.film_id = films.id) " +
+                "where id = ?";
+
+        jdbcTemplate.update(sql, id);
     }
 
     private Genre constructGenreFromQueryResult(ResultSet rs) throws SQLException {
@@ -258,6 +260,7 @@ public class FilmDbStorage implements FilmStorage {
                 .description(rs.getString("description"))
                 .duration(rs.getInt("duration_min"))
                 .releaseDate(rs.getDate("release_date").toLocalDate())
+                .rate(rs.getDouble("rate"))
                 .build();
     }
 
@@ -306,6 +309,7 @@ public class FilmDbStorage implements FilmStorage {
         values.put("release_date", film.getReleaseDate());
         values.put("duration_min", film.getDuration());
         values.put("rating_mpa_id", film.getMpa().getId());
+        values.put("rate", film.getRate());
 
         return values;
     }
