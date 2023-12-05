@@ -116,6 +116,7 @@ public class FilmDbStorage implements FilmStorage {
                 "         INNER JOIN FILM_MARKS marksThree " +
                 "                    ON near.USER2_ID = marksThree.USER_ID " +
                 "WHERE marksThree.FILM_ID NOT IN (SELECT FILM_ID FROM FILM_MARKS WHERE USER_ID = near.USER1_ID) " +
+                "AND marksThree.MARK BETWEEN 6 AND 10 " +
                 "ORDER BY near.CNT DESC ";
 
         String sql = MAIN_SELECT + ", (" + recommendedFilmIdsQuery + ") as top where top.FILM_ID = films.ID order by genre_id";
