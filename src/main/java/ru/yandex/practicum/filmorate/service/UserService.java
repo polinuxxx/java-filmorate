@@ -50,6 +50,12 @@ public class UserService {
         return userStorage.getById(id);
     }
 
+    public User getByLogin(String login) {
+        log.debug("Получение пользователя по логину = {}", login);
+
+        return userStorage.getByLogin(login);
+    }
+
     /**
      * Получаем список рекомендуемых фильмов.
      *

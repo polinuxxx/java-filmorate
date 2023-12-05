@@ -64,6 +64,16 @@ public class UserController {
     }
 
     /**
+     * Получение пользователя по логину.
+     * @return пользователь
+     */
+    @GetMapping("/{login}")
+    @Operation(summary = "Получение пользователя по логину")
+    public UserResponse getByLogin(@PathVariable @Parameter(description = "Логин пользователя") String login) {
+        return userConverter.convert(userService.getByLogin(login));
+    }
+
+    /**
      * Получение рекомендуемых фильмов.
      * @param id идентификатор пользователя
      * @return список рекомендуемых фильмов

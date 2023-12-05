@@ -57,7 +57,7 @@ public class SecurityConfig {
                 //Доступ только для не зарегистрированных пользователей
                 .antMatchers("/registration").not().fullyAuthenticated()
                 //Доступ только для пользователей с Authority CLIENT
-                .antMatchers("/ui/**").hasAuthority("CLIENT")
+                //.antMatchers("/ui/**").hasAuthority("CLIENT")
                 //Доступ разрешен всем пользователям
                 .antMatchers("/**", "/resources/**").permitAll()
                 //Все остальные страницы требуют аутентификации

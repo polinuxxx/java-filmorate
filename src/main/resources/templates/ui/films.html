@@ -43,7 +43,7 @@
                  class="text-body-secondary">Отзывы</a>
             </div>
             <div class="text-end">
-              <a th:href="@{/ui/review_create?filmId={filmId}(filmId=${film.getId()})}"
+              <a th:href="@{/ui/reviews/create(filmId=${film.getId()})}"
                  class="text-body-secondary">Добавить отзыв</a>
             </div>
           </div>

@@ -32,6 +32,17 @@ public class UserDbStorage implements UserStorage {
         return users.get(0);
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getByLogin(String login) {
+        String sql = MAIN_SELECT + "where login = ?";
+
+        List<User> users = jdbcTemplate.query(sql, UserDbStorage::toUser, login);
+
+        return users.get(0);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<User> getAll() {
