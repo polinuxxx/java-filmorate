@@ -103,7 +103,7 @@ public class FilmDbStorage implements FilmStorage {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<Film> getRecommendationFilms(Long userId) {
+    public List<Film> getRecommendedFilms(Long userId) {
 
         String recommendedFilmIdsQuery = "SELECT marksThree.FILM_ID " +
                 "FROM (SELECT marksOne.USER_ID AS USER1_ID, marksTwo.USER_ID AS USER2_ID, COUNT(*) AS CNT " +

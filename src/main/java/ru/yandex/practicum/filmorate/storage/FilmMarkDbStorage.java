@@ -27,7 +27,7 @@ public class FilmMarkDbStorage {
 
     @Transactional(readOnly = true)
     public boolean exists(Long filmId, Long userId) {
-        String sql = "select exists(select film_id from likes where film_id = ? and user_id = ?)";
+        String sql = "select exists(select film_id from film_marks where film_id = ? and user_id = ?)";
 
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, filmId, userId);
 

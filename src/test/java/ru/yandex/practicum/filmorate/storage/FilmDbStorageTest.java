@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RatingMpa;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,9 +30,13 @@ class FilmDbStorageTest {
 
     private UserStorage userStorage;
 
-    private FilmMarkDbStorage likeStorage;
+    private FilmMarkDbStorage markStorage;
 
     private FilmGenreDbStorage filmGenreStorage;
+
+    private FilmDirectorDbStorage filmDirectorStorage;
+
+    private DirectorStorage directorStorage;
 
     private User firstUser;
 
@@ -45,12 +46,28 @@ class FilmDbStorageTest {
 
     private Film secondFilm;
 
+    private Director firstDirector;
+
+    private Director secondDirector;
+
     @BeforeEach
     void setUp() {
         filmStorage = new FilmDbStorage(jdbcTemplate);
         userStorage = new UserDbStorage(jdbcTemplate);
-        likeStorage = new FilmMarkDbStorage(jdbcTemplate);
+        markStorage = new FilmMarkDbStorage(jdbcTemplate);
         filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
+        directorStorage = new DirectorDbStorage(jdbcTemplate);
+
+        firstDirector = Director.builder()
+                .id(1L)
+                .name("Chris Columbus")
+                .build();
+
+        secondDirector = Director.builder()
+                .id(2L)
+                .name("Wes Anderson")
+                .build();
 
         firstFilm = Film.builder()
                 .id(1L)
@@ -61,6 +78,8 @@ class FilmDbStorageTest {
                 .mpa(RatingMpa.builder().id(1L).name("G").description("У фильма нет возрастных ограничений").build())
                 .genres(Set.of(Genre.builder().id(1L).name("Комедия").build(),
                         Genre.builder().id(2L).name("Драма").build()))
+                .directors(Set.of(firstDirector))
+                .rate(0.0)
                 .build();
 
         secondFilm = Film.builder()
@@ -71,6 +90,8 @@ class FilmDbStorageTest {
                 .releaseDate(LocalDate.of(2023, 7, 9))
                 .mpa(RatingMpa.builder().id(1L).name("G").description("У фильма нет возрастных ограничений").build())
                 .genres(Set.of(Genre.builder().id(1L).name("Комедия").build()))
+                .directors(Set.of(firstDirector, secondDirector))
+                .rate(0.0)
                 .build();
 
         firstUser = User.builder()
@@ -92,8 +113,10 @@ class FilmDbStorageTest {
 
     @Test
     void getById() {
+        directorStorage.create(firstDirector);
         filmStorage.create(firstFilm);
         filmGenreStorage.addGenresToFilm(firstFilm.getId(), firstFilm.getGenres());
+        filmDirectorStorage.addDirectorToFilm(firstFilm.getId(), firstFilm.getDirectors());
 
         Film savedFilm = filmStorage.getById(firstFilm.getId());
 
@@ -105,10 +128,14 @@ class FilmDbStorageTest {
 
     @Test
     void getAll() {
+        directorStorage.create(firstDirector);
+        directorStorage.create(secondDirector);
         filmStorage.create(firstFilm);
         filmGenreStorage.addGenresToFilm(firstFilm.getId(), firstFilm.getGenres());
+        filmDirectorStorage.addDirectorToFilm(firstFilm.getId(), firstFilm.getDirectors());
         filmStorage.create(secondFilm);
         filmGenreStorage.addGenresToFilm(secondFilm.getId(), secondFilm.getGenres());
+        filmDirectorStorage.addDirectorToFilm(secondFilm.getId(), secondFilm.getDirectors());
 
         List<Film> films = filmStorage.getAll();
 
@@ -130,14 +157,27 @@ class FilmDbStorageTest {
 
     @Test
     void create() {
+        directorStorage.create(firstDirector);
         filmStorage.create(firstFilm);
+        filmGenreStorage.addGenresToFilm(firstFilm.getId(), firstFilm.getGenres());
+        filmDirectorStorage.addDirectorToFilm(firstFilm.getId(), firstFilm.getDirectors());
+
+        Film savedFilm = filmStorage.getById(firstFilm.getId());
+
         assertTrue(filmStorage.exists(firstFilm.getId()));
+        assertThat(savedFilm)
+                .isNotNull()
+                .usingRecursiveComparison()
+                .isEqualTo(firstFilm);
     }
 
     @Test
     void update() {
+        directorStorage.create(firstDirector);
+
         filmStorage.create(firstFilm);
         filmGenreStorage.addGenresToFilm(firstFilm.getId(), firstFilm.getGenres());
+        filmDirectorStorage.addDirectorToFilm(firstFilm.getId(), firstFilm.getDirectors());
 
         firstFilm.setName("Barbie girl");
         filmStorage.update(firstFilm);
@@ -158,5 +198,4 @@ class FilmDbStorageTest {
 
         assertFalse(filmStorage.exists(firstFilm.getId()));
     }
-
 }

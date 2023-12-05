@@ -15,5 +15,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 public class MarkCreateRequest {
 
     @Range(min = 1, max = 10, message = "Допустимая оценка от 1 до 10 включительно")
+    @Schema(description = "Оценка фильма (1-10)")
     private Integer mark;
 }

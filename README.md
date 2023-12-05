@@ -36,7 +36,7 @@ friend members and watch news feed
 ### getting film likes
 ```sql
 SELECT COUNT(user_id)
-  FROM likes
+  FROM film_marks
   WHERE film_id = :id;
 ```
 ### getting user friends
@@ -48,10 +48,10 @@ SELECT friend_id
 ### getting most popular films
 ```sql
 SELECT film_id,
-       COUNT(user_id) AS likes
-  FROM likes
+       AVG(mark) AS rate
+  FROM film_marks
   GROUP BY film_id
-  ORDER BY likes DESC
+  ORDER BY rate DESC
   LIMIT :count;
 ```
 

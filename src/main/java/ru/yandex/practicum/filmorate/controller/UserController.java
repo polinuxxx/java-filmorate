@@ -72,7 +72,7 @@ public class UserController {
     @Operation(summary = "Получение рекомендуемых фильмов")
     public List<FilmResponse> getRecommendations(
             @PathVariable @Parameter(description = "Идентификатор пользователя") Long id) {
-        return filmConverter.convert(userService.getRecommendationsFilms(id));
+        return filmConverter.convert(userService.getRecommendedFilms(id));
     }
 
     /**

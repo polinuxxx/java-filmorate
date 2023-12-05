@@ -95,7 +95,7 @@ public class FilmController {
      * @param userId идентификатор пользователя
      * @param mark   оценка от 1 до 10 включительно
      */
-    @PutMapping("/{id}/marks/{userId}/{mark}")
+    @PutMapping("/{id}/marks/{userId}")
     @Operation(summary = "Добавление оценки пользователя к фильму")
     public void addMark(@PathVariable Long id,
                         @PathVariable Long userId,
