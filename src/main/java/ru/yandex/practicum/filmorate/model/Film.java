@@ -34,6 +34,5 @@ public class Film extends AbstractEntity {
 
     private RatingMpa mpa;
 
-    @Builder.Default
-    private Double rate = 0.0;
+    private Double rate;
 }

@@ -89,7 +89,7 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         if (!byToQuery.isEmpty()) {
-            sql = sql + "where " + byToQuery + " order by films.rate desc";
+            sql = sql + "where " + byToQuery + " order by films.rate desc nulls last, films.id desc";
         }
 
         return getCompleteFilmFromQuery(sql, listParams.toArray());
@@ -168,7 +168,7 @@ public class FilmDbStorage implements FilmStorage {
                 "where 1 = 1 " +
                 (!Objects.isNull(genreId) ? "and films.ID IN (SELECT FILM_ID FROM FILM_GENRES WHERE GENRE_ID = ?) " : "") +
                 (!Objects.isNull(year) ? "and YEAR(FILMS.RELEASE_DATE) = ? " : "") +
-                "order by rate desc, genre_id " +
+                "order by rate desc nulls last, genre_id, films.id " +
                 "limit ?";
 
         List<Object> params = new ArrayList<>();
@@ -191,7 +191,7 @@ public class FilmDbStorage implements FilmStorage {
         if (sortBy.equals("likes")) {
             sql = MAIN_SELECT + " " +
                     "where directors.id = ? " +
-                    "order by films.rate desc, genre_id";
+                    "order by films.rate desc nulls last, genre_id";
         } else if (sortBy.equals("year")) {
             sql = MAIN_SELECT + " " +
                     "where directors.id = ? " +
@@ -209,7 +209,7 @@ public class FilmDbStorage implements FilmStorage {
         String sql = MAIN_SELECT +
                 "JOIN (SELECT film_id FROM film_marks WHERE user_id = ?) marksOne ON films.id = marksOne.film_id " +
                 "JOIN (SELECT film_id FROM film_marks WHERE user_id = ?) marksTwo ON films.id = marksTwo.film_id " +
-                "ORDER BY films.rate DESC";
+                "ORDER BY films.rate DESC, films.id DESC";
         return getCompleteFilmFromQuery(sql, userId, friendId);
     }
 
@@ -226,7 +226,7 @@ public class FilmDbStorage implements FilmStorage {
     @Transactional
     public void recalculateRate(Long id) {
         String sql = "update films set rate = " +
-                "(select coalesce(avg(marks.mark), 0.00) from film_marks as marks where marks.film_id = films.id) " +
+                "(select avg(marks.mark) from film_marks as marks where marks.film_id = films.id) " +
                 "where id = ?";
 
         jdbcTemplate.update(sql, id);

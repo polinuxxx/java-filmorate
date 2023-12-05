@@ -3,12 +3,12 @@ package ru.yandex.practicum.filmorate.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.constraints.Range;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.converter.FilmConverter;
 import ru.yandex.practicum.filmorate.dto.request.FilmCreateRequest;
 import ru.yandex.practicum.filmorate.dto.request.FilmUpdateRequest;
+import ru.yandex.practicum.filmorate.dto.request.MarkCreateRequest;
 import ru.yandex.practicum.filmorate.dto.response.FilmResponse;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -91,22 +91,22 @@ public class FilmController {
     /**
      * Добавление фильму оценки.
      *
-     * @param id идентификатор фильма
+     * @param id     идентификатор фильма
      * @param userId идентификатор пользователя
-     * @param mark оценка от 1 до 10 включительно
+     * @param mark   оценка от 1 до 10 включительно
      */
     @PutMapping("/{id}/marks/{userId}/{mark}")
     @Operation(summary = "Добавление оценки пользователя к фильму")
-    public void addLike(@PathVariable Long id,
+    public void addMark(@PathVariable Long id,
                         @PathVariable Long userId,
-                        @PathVariable @Range(min = 1, max = 10) Integer mark) {
-        filmService.addMark(id, userId, mark);
+                        @RequestBody @Valid MarkCreateRequest mark) {
+        filmService.addMark(id, userId, mark.getMark());
     }
 
     /**
      * Удаление у фильма оценки.
      *
-     * @param id идентификатор фильма
+     * @param id     идентификатор фильма
      * @param userId идентификатор пользователя
      */
     @DeleteMapping("/{id}/marks/{userId}")

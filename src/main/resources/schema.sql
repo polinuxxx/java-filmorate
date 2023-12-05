@@ -15,7 +15,7 @@ create table if not exists FILMS
     RELEASE_DATE  DATE,
     DURATION_MIN  INTEGER,
     RATING_MPA_ID BIGINT,
-    RATE          DOUBLE not null default 0.00,
+    RATE          DOUBLE,
     constraint FILM_PK
         primary key (ID),
     constraint "FILM_RATING_MPA_ID_fk"
