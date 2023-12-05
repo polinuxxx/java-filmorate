@@ -44,7 +44,7 @@ class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/film/film-release-date-less-than-28-december-1895.json")))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                .andReturn().getResolvedException().getMessage().equals("Дата релиза не может быть раньше 28 декабря 1895 года");
+                .andReturn();
     }
 
     @Test
@@ -53,7 +53,7 @@ class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/film/film-name-empty.json")))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                .andReturn().getResolvedException().getMessage().equals("Название не может быть пустым");
+                .andReturn();
     }
 
     @Test
@@ -62,7 +62,7 @@ class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/film/film-description-more-200-symbols.json")))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                .andReturn().getResolvedException().getMessage().equals("Описание не может превышать 200 символов");
+                .andReturn();
     }
 
     @Test
@@ -71,7 +71,7 @@ class FilmControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/film/film-duration-negative.json")))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                .andReturn().getResolvedException().getMessage().equals("Продолжительность должна быть положительной");
+                .andReturn();
     }
 
     private String getContentFromFile(String fileName) {

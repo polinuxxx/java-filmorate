@@ -44,7 +44,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/user/user-birthday-future.json")))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                .andReturn().getResolvedException().getMessage().equals("Дата рождения не может быть в будущем");
+                .andReturn();
     }
 
     @Test
@@ -53,7 +53,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/user/user-email-empty.json")))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                .andReturn().getResolvedException().getMessage().equals("Электронная почта не может быть пустой");
+                .andReturn();
     }
 
     @Test
@@ -62,7 +62,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/user/user-email-incorrect-format.json")))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                .andReturn().getResolvedException().getMessage().equals("Электронная почта не соответствует формату");
+                .andReturn();
     }
 
     @Test
@@ -71,7 +71,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/user/user-login-empty.json")))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                .andReturn().getResolvedException().getMessage().equals("Логин не может быть пустым");
+                .andReturn();
     }
 
     @Test
@@ -80,7 +80,7 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("controller/request/user/user-login-with-spaces.json")))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                .andReturn().getResolvedException().getMessage().equals("Логин не может содержать пробелы");
+                .andReturn();
     }
 
     private String getContentFromFile(String fileName) {

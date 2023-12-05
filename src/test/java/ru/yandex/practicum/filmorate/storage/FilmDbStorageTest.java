@@ -28,19 +28,11 @@ class FilmDbStorageTest {
 
     private FilmStorage filmStorage;
 
-    private UserStorage userStorage;
-
-    private FilmMarkDbStorage markStorage;
-
     private FilmGenreDbStorage filmGenreStorage;
 
     private FilmDirectorDbStorage filmDirectorStorage;
 
     private DirectorStorage directorStorage;
-
-    private User firstUser;
-
-    private User secondUser;
 
     private Film firstFilm;
 
@@ -53,8 +45,6 @@ class FilmDbStorageTest {
     @BeforeEach
     void setUp() {
         filmStorage = new FilmDbStorage(jdbcTemplate);
-        userStorage = new UserDbStorage(jdbcTemplate);
-        markStorage = new FilmMarkDbStorage(jdbcTemplate);
         filmGenreStorage = new FilmGenreDbStorage(jdbcTemplate);
         filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
         directorStorage = new DirectorDbStorage(jdbcTemplate);
@@ -92,22 +82,6 @@ class FilmDbStorageTest {
                 .genres(Set.of(Genre.builder().id(1L).name("Комедия").build()))
                 .directors(Set.of(firstDirector, secondDirector))
                 .rate(0.0)
-                .build();
-
-        firstUser = User.builder()
-                .id(1L)
-                .name("Яна")
-                .email("yana@mail.ru")
-                .login("girl")
-                .birthday(LocalDate.of(1980, 1, 1))
-                .build();
-
-        secondUser = User.builder()
-                .id(2L)
-                .name("Игорь")
-                .email("igor@gmail.com")
-                .login("boy")
-                .birthday(LocalDate.of(2003, 5, 23))
                 .build();
     }
 
