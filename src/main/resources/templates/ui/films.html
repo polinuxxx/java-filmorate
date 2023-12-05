@@ -12,21 +12,22 @@
 <div th:fragment="films" class="album py-5 bg-body-tertiary">
   <div class="container">
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-      <div th:each="film: ${films}" class="col" >
+      <div th:each="film: ${films}" class="col">
         <div class="card shadow-sm">
           <div class="col p-4 d-flex flex-column position-static">
-            <h3 class="mb-1" th:text="${film.getName()}"></h3>
+            <h3 class="mb-1 text-center" th:text="${film.getName()}"></h3>
             <div class="d-flex justify-content-between align-items-center">
               <div class="text-body-secondary"
-                   th:text="${#temporals.format(film.getReleaseDate(), 'dd MMMM yyyy', new java.util.Locale('ru', 'RU'))}"></div>
-              <div class="text-body-secondary">
-                <ul class="d-inline-flex">
-                  <li th:each="genre : ${film.getGenres()}" th:text="${genre.getName()}"
-                      class="nav-link px-1 text-secondary"></li>
-                </ul>
-              </div>
+                   th:text="${'Дата релиза: ' + #temporals.format(film.getReleaseDate(), 'dd MMMM yyyy', new java.util.Locale('ru', 'RU'))}"></div>
+              <p class="card-text" th:text="${film.getDuration() + ' мин.'}"></p>
             </div>
-            <p class="card-text" th:text="${film.getDuration() + ' мин.'}"></p>
+
+            <div class="d-flex" style="display: inline-block; padding-top: 5px; padding-right: 5px;">
+              <p>Жанры: </p>
+              <p th:each="genre : ${film.getGenres()}" th:text="${genre.getName() + ' '}"
+                 style="padding-right: 5px;"></p>
+            </div>
+
             <p class="card-text" th:text="${film.getDescription()}"></p>
             <p class="card-text" th:text="${'Рейтинг: ' + film.getMpa().getName() + ''}"></p>
 
