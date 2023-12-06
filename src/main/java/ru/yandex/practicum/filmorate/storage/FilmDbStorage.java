@@ -168,13 +168,19 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     @Transactional(readOnly = true)
     public List<Film> getPopular(int count, Integer genreId, Integer year) {
-        String sql = MAIN_SELECT +
-                "where 1 = 1 " +
+        String sql = MAIN_SELECT
+                + ", (select ID, RATE as rate, count(1) as cnt "
+                + "      from FILMS"
+                + "         left join FILM_MARKS on FILMS.ID = FILM_MARKS.FILM_ID "
+                + "   where 1 = 1 " +
                 (!Objects.isNull(genreId) ? "and films.ID IN (SELECT FILM_ID FROM FILM_GENRES WHERE GENRE_ID = ?) "
                         : "") +
-                (!Objects.isNull(year) ? "and YEAR(FILMS.RELEASE_DATE) = ? " : "") +
-                "order by rate desc nulls last, genre_id, films.id " +
-                "limit ?";
+                (!Objects.isNull(year) ? "and YEAR(FILMS.RELEASE_DATE) = ? " : "")
+                + "   group by id "
+                + "   order by rate desc nulls last"
+                + "   limit ?) top "
+                + " where films.ID = top.id "
+                + " order by top.rate desc nulls last, top.cnt desc, films.id, genre_id";
 
         List<Object> params = new ArrayList<>();
         if (!Objects.isNull(genreId)) {
