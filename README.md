@@ -31,6 +31,7 @@ friend members and watch news feed
 - [x] https://github.com/polinuxxx/java-filmorate/issues/32 @romilMasnaviev
 - [x] https://github.com/polinuxxx/java-filmorate/issues/33 @romilMasnaviev
 - [x] https://github.com/polinuxxx/java-filmorate/issues/34 @PavelIgK
+- [x] https://github.com/polinuxxx/java-filmorate/issues/35 @yelgazin
 
 ## query examples
 ### getting film likes
