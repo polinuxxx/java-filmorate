@@ -40,4 +40,6 @@ public class FilmResponse {
     @Schema(description = "Рейтинг MPA")
     private RatingMpaResponse mpa;
 
+    @Schema(description = "Рейтинг фильма среди пользователей")
+    private Double rate;
 }

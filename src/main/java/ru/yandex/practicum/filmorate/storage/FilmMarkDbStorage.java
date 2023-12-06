@@ -6,28 +6,28 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * DAO для лайков фильмов.
+ * DAO для оценок фильмов.
  */
 @Component
 @RequiredArgsConstructor
-public class LikeDbStorage {
+public class FilmMarkDbStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Transactional
-    public void addLikeToFilm(Long filmId, Long userId) {
-        jdbcTemplate.update("merge into likes (film_id, user_id) values (?, ?)",
-                filmId, userId);
+    public void addMarkToFilm(Long filmId, Long userId, Integer mark) {
+        jdbcTemplate.update("merge into film_marks (film_id, user_id, mark) values (?, ?, ?)",
+                filmId, userId, mark);
     }
 
     @Transactional
-    public void deleteLikeFromFilm(Long filmId, Long userId) {
-        jdbcTemplate.update("delete from likes where film_id = ? and user_id = ?", filmId, userId);
+    public void deleteMarkFromFilm(Long filmId, Long userId) {
+        jdbcTemplate.update("delete from film_marks where film_id = ? and user_id = ?", filmId, userId);
     }
 
     @Transactional(readOnly = true)
     public boolean exists(Long filmId, Long userId) {
-        String sql = "select exists(select film_id from likes where film_id = ? and user_id = ?)";
+        String sql = "select exists(select film_id from film_marks where film_id = ? and user_id = ?)";
 
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, filmId, userId);
 

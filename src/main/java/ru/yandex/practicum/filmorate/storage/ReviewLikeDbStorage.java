@@ -25,4 +25,13 @@ public class ReviewLikeDbStorage {
         jdbcTemplate.update("delete from review_likes where review_id = ? and user_id = ? and reaction = ?",
                 reviewId, userId, reaction);
     }
+
+    @Transactional(readOnly = true)
+    public boolean exists(Long reviewId, Long userId) {
+        String sql = "select exists(select user_id from review_likes where review_id = ? and user_id = ?)";
+
+        Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, reviewId, userId);
+
+        return exists != null && exists;
+    }
 }

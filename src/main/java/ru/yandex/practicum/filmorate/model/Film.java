@@ -33,4 +33,6 @@ public class Film extends AbstractEntity {
     private Set<Director> directors = new HashSet<>();
 
     private RatingMpa mpa;
+
+    private Double rate;
 }

@@ -29,7 +29,7 @@ public class FilmService {
     @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
 
-    private final LikeDbStorage likeStorage;
+    private final FilmMarkDbStorage filmMarkDbStorage;
 
     private final GenreStorage genreStorage;
 
@@ -107,13 +107,15 @@ public class FilmService {
         filmStorage.delete(id);
     }
 
-    public void addLike(Long filmId, Long userId) {
-        log.debug("Добавление лайка фильму с id = {} пользователем {}", filmId, userId);
+    public void addMark(Long filmId, Long userId, Integer mark) {
+        log.debug("Добавление фильму с id = {} пользователем {} оценки {}", filmId, userId, mark);
 
         exists(filmId);
         checkUserExists(userId);
 
-        likeStorage.addLikeToFilm(filmId, userId);
+        filmMarkDbStorage.addMarkToFilm(filmId, userId, mark);
+        filmStorage.recalculateRate(filmId);
+
         User user = userStorage.getById(userId);
         eventService.add(Event.builder()
                 .user(user)
@@ -123,13 +125,15 @@ public class FilmService {
                 .build());
     }
 
-    public void deleteLike(Long filmId, Long userId) {
-        log.debug("Удаление лайка у фильма с id = {} пользователем {}", filmId, userId);
+    public void deleteMark(Long filmId, Long userId) {
+        log.debug("Удаление оценки у фильма с id = {} пользователем {}", filmId, userId);
 
         exists(filmId);
         checkUserExists(userId);
 
-        likeStorage.deleteLikeFromFilm(filmId, userId);
+        filmMarkDbStorage.deleteMarkFromFilm(filmId, userId);
+        filmStorage.recalculateRate(filmId);
+
         User user = userStorage.getById(userId);
         eventService.add(Event.builder()
                 .user(user)
