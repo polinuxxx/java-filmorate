@@ -34,8 +34,8 @@ public class FilmGenreDbStorage {
 
     @Transactional(readOnly = true)
     public boolean exists(Long filmId, Long genreId) {
-        String sql = "select case when count(film_id) > 0 then true else false end " +
-                "from film_genres where film_id = ? and genre_id = ?";
+        String sql = "select exists(select film_id from film_genres where film_id = ? and genre_id = ?)";
+
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, filmId, genreId);
 
         return exists != null && exists;

@@ -30,7 +30,7 @@ public class DirectorService {
     }
 
     /**
-     * Получение режисера по идентификатору
+     * Получение режиссера по идентификатору
      *
      * @param directorId - идентификатор режиссера
      */
@@ -85,7 +85,7 @@ public class DirectorService {
         log.debug("Проверка режиссера на существование");
 
         if (id != null && !directorStorage.exists(id)) {
-            throw new EntityNotFoundException(String.format("Не найден режисер по id = %d.", id));
+            throw new EntityNotFoundException(String.format("Не найден режиссер по id = %d.", id));
         }
     }
 

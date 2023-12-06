@@ -105,7 +105,7 @@ public class ReviewDbStorage implements ReviewStorage {
         return jdbcTemplate.query(sql, ReviewDbStorage::toReview, count);
     }
 
-    private static Review toReview(ResultSet rs, int rowNum) throws SQLException {
+    static Review toReview(ResultSet rs, int rowNum) throws SQLException {
         return Review.builder()
                 .id(rs.getLong("id"))
                 .content(rs.getString("content"))

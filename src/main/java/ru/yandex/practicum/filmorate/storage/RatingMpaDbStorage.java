@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.storage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -24,9 +26,7 @@ public class RatingMpaDbStorage implements RatingMpaStorage {
     public RatingMpa getById(Long id) {
         String sql = MAIN_SELECT + "where id = ?";
 
-        List<RatingMpa> mpa = jdbcTemplate.query(sql, RatingMpaDbStorage::toMpa, id);
-
-        return mpa.get(0);
+        return jdbcTemplate.queryForObject(sql, RatingMpaDbStorage::toMpa, id);
     }
 
     @Override
@@ -55,7 +55,8 @@ public class RatingMpaDbStorage implements RatingMpaStorage {
     @Override
     @Transactional(readOnly = true)
     public boolean exists(Long id) {
-        String sql = "select case when count(id) > 0 then true else false end from rating_mpa where id = ?";
+        String sql = "select exists(select id from rating_mpa where id = ?)";
+
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, id);
 
         return exists != null && exists;
@@ -67,5 +68,14 @@ public class RatingMpaDbStorage implements RatingMpaStorage {
                 .name(rs.getString("name"))
                 .description(rs.getString("description"))
                 .build();
+    }
+
+    private Map<String, Object> toMap(RatingMpa mpa) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("id", mpa.getId());
+        values.put("name", mpa.getName());
+        values.put("description", mpa.getDescription());
+
+        return values;
     }
 }

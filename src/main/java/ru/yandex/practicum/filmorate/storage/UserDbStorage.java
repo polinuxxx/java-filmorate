@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.storage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -25,9 +27,7 @@ public class UserDbStorage implements UserStorage {
     public User getById(Long id) {
         String sql = MAIN_SELECT + "where id = ?";
 
-        List<User> users = jdbcTemplate.query(sql, UserDbStorage::toUser, id);
-
-        return users.get(0);
+        return jdbcTemplate.queryForObject(sql, UserDbStorage::toUser, id);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class UserDbStorage implements UserStorage {
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
 
-        item.setId(simpleJdbcInsert.executeAndReturnKey(item.toMap()).longValue());
+        item.setId(simpleJdbcInsert.executeAndReturnKey(toMap(item)).longValue());
 
         return getById(item.getId());
     }
@@ -76,7 +76,8 @@ public class UserDbStorage implements UserStorage {
     @Override
     @Transactional(readOnly = true)
     public boolean exists(Long id) {
-        String sql = "select case when count(id) > 0 then true else false end from users where id = ?";
+        String sql = "select exists(select id from users where id = ?)";
+
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, id);
 
         return exists != null && exists;
@@ -90,5 +91,15 @@ public class UserDbStorage implements UserStorage {
                 .email(rs.getString("email"))
                 .birthday(rs.getDate("birthday").toLocalDate())
                 .build();
+    }
+
+    private Map<String, Object> toMap(User user) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("id", user.getId());
+        values.put("email", user.getEmail());
+        values.put("login", user.getLogin());
+        values.put("name", user.getName());
+        values.put("birthday", user.getBirthday());
+        return values;
     }
 }

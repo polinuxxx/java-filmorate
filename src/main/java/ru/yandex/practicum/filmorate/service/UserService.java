@@ -56,12 +56,12 @@ public class UserService {
      * @param id пользователя.
      * @return список фильмов.
      */
-    public List<Film> getRecommendationsFilms(Long id) {
+    public List<Film> getRecommendedFilms(Long id) {
         log.debug("Получение рекомендации для пользователя с id = {}", id);
 
         exists(id);
 
-        return filmStorage.getRecommendationFilms(id);
+        return filmStorage.getRecommendedFilms(id);
     }
 
     public User create(User user) {

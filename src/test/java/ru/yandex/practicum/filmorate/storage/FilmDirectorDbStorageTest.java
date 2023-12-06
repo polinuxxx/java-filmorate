@@ -9,46 +9,40 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RatingMpa;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Тесты для {@link LikeDbStorage}.
+ * Тесты для {@link FilmDirectorDbStorage}.
  */
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class LikeDbStorageTest {
+class FilmDirectorDbStorageTest {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private LikeDbStorage likeStorage;
+    private FilmDirectorDbStorage filmDirectorStorage;
 
-    private UserStorage userStorage;
+    private DirectorStorage directorStorage;
 
     private FilmStorage filmStorage;
 
     private Film film;
 
-    private User user;
+    private Director director;
 
     @BeforeEach
     void setUp() {
-        likeStorage = new LikeDbStorage(jdbcTemplate);
-        userStorage = new UserDbStorage(jdbcTemplate);
+        filmDirectorStorage = new FilmDirectorDbStorage(jdbcTemplate);
+        directorStorage = new DirectorDbStorage(jdbcTemplate);
         filmStorage = new FilmDbStorage(jdbcTemplate);
 
-        user = User.builder()
+        director = Director.builder()
                 .id(1L)
-                .name("Яна")
-                .email("yana@mail.ru")
-                .login("girl")
-                .birthday(LocalDate.of(1980, 1, 1))
+                .name("Chris Columbus")
                 .build();
 
         film = Film.builder()
@@ -63,23 +57,23 @@ class LikeDbStorageTest {
     }
 
     @Test
-    void addLikeToFilm() {
-        userStorage.create(user);
+    void addDirectorToFilm() {
+        directorStorage.create(director);
         filmStorage.create(film);
 
-        likeStorage.addLikeToFilm(film.getId(), user.getId());
+        filmDirectorStorage.addDirectorToFilm(film.getId(), director.getId());
 
-        assertTrue(likeStorage.exists(film.getId(), user.getId()));
+        assertTrue(filmDirectorStorage.exists(film.getId(), director.getId()));
     }
 
     @Test
-    void deleteLikeFromFilm() {
-        userStorage.create(user);
+    void deleteDirectorsFromFilm() {
+        directorStorage.create(director);
         filmStorage.create(film);
 
-        likeStorage.addLikeToFilm(film.getId(), user.getId());
-        likeStorage.deleteLikeFromFilm(film.getId(), user.getId());
+        filmDirectorStorage.addDirectorToFilm(film.getId(), director.getId());
+        filmDirectorStorage.deleteDirectorsFromFilm(film.getId());
 
-        assertFalse(likeStorage.exists(film.getId(), user.getId()));
+        assertFalse(filmDirectorStorage.exists(film.getId(), director.getId()));
     }
 }

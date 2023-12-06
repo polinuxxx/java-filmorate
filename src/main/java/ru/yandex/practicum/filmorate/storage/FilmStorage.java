@@ -14,8 +14,9 @@ public interface FilmStorage extends Storage<Film> {
 
     List<Film> getFilmsByDirector(Long directorId, String sortBy);
 
-    List<Film> getRecommendationFilms(Long userId);
+    List<Film> getRecommendedFilms(Long userId);
 
     List<Film> getCommonFilms(Long userId, Long friendId);
 
+    void recalculateRate(Long id);
 }

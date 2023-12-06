@@ -10,7 +10,9 @@ import ru.yandex.practicum.filmorate.model.Director;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DAO для {@link Director}.
@@ -34,9 +36,7 @@ public class DirectorDbStorage implements DirectorStorage {
     public Director getById(Long id) {
         String sql = "SELECT id, name FROM directors WHERE id = ?";
 
-        List<Director> directors = jdbcTemplate.query(sql, DirectorDbStorage::toDirector, id);
-
-        return directors.get(0);
+        return jdbcTemplate.queryForObject(sql, DirectorDbStorage::toDirector, id);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class DirectorDbStorage implements DirectorStorage {
                 .withTableName("directors")
                 .usingGeneratedKeyColumns("id");
 
-        director.setId(simpleJdbcInsert.executeAndReturnKey(director.toMap()).longValue());
+        director.setId(simpleJdbcInsert.executeAndReturnKey(toMap(director)).longValue());
 
         return getById(director.getId());
     }
@@ -82,10 +82,17 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     @Transactional(readOnly = true)
     public boolean exists(Long id) {
-        String sql = "SELECT CASE WHEN COUNT(id) > 0 THEN true ELSE false END FROM directors WHERE id = ?";
+        String sql = "select exists(select id from directors where id = ?)";
 
         Boolean exists = jdbcTemplate.queryForObject(sql, Boolean.class, id);
 
         return exists != null && exists;
+    }
+
+    private Map<String, Object> toMap(Director director) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("name", director.getName());
+
+        return values;
     }
 }
