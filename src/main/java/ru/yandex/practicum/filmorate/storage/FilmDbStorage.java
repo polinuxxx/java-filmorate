@@ -21,6 +21,7 @@ import ru.yandex.practicum.filmorate.model.RatingMpa;
 @Component("filmDbStorage")
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
+
     private static final String MAIN_SELECT = "select films.id, films.name, films.description, films.duration_min, " +
             "films.release_date, films.rate, films.rating_mpa_id as mpa_id, mpa.name as mpa_name, mpa.description " +
             "as mpa_description, genres.id as genre_id, genres.name as genre_name, " +
@@ -57,7 +58,7 @@ public class FilmDbStorage implements FilmStorage {
      * Метод для поиска фильмов по строке поиска в любом регистре и переданным полям для поиска.
      *
      * @param query строка для поиска
-     * @param by поля для поиска через запятую, варианты: director, title
+     * @param by    поля для поиска через запятую, варианты: director, title
      * @return список фильмов.
      */
     @Override
@@ -72,7 +73,9 @@ public class FilmDbStorage implements FilmStorage {
         while (it.hasNext()) {
             switch (it.next()) {
                 case "director":
-                    byToQuery = byToQuery + "LOWER(directors.name) like ? ";
+                    byToQuery = byToQuery
+                            + "films.id IN (SELECT film_id FROM film_directors WHERE director_id in "
+                            + "(select id from directors where LOWER(name) like ? ))";
                     listParams.add("%" + query.toLowerCase() + "%");
                     break;
                 case "title":
@@ -98,7 +101,7 @@ public class FilmDbStorage implements FilmStorage {
     /**
      * Получение списка рекомендуемых фильмов по айди пользователя.
      *
-     * @param userId  id пользователя
+     * @param userId id пользователя
      * @return List фильмов.
      */
     @Override
@@ -119,7 +122,8 @@ public class FilmDbStorage implements FilmStorage {
                 "AND marksThree.MARK BETWEEN 6 AND 10 " +
                 "ORDER BY near.CNT DESC ";
 
-        String sql = MAIN_SELECT + ", (" + recommendedFilmIdsQuery + ") as top where top.FILM_ID = films.ID order by genre_id";
+        String sql = MAIN_SELECT + ", (" + recommendedFilmIdsQuery
+                + ") as top where top.FILM_ID = films.ID order by genre_id";
 
         return getCompleteFilmFromQuery(sql, userId);
     }
@@ -166,7 +170,8 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> getPopular(int count, Integer genreId, Integer year) {
         String sql = MAIN_SELECT +
                 "where 1 = 1 " +
-                (!Objects.isNull(genreId) ? "and films.ID IN (SELECT FILM_ID FROM FILM_GENRES WHERE GENRE_ID = ?) " : "") +
+                (!Objects.isNull(genreId) ? "and films.ID IN (SELECT FILM_ID FROM FILM_GENRES WHERE GENRE_ID = ?) "
+                        : "") +
                 (!Objects.isNull(year) ? "and YEAR(FILMS.RELEASE_DATE) = ? " : "") +
                 "order by rate desc nulls last, genre_id, films.id " +
                 "limit ?";
