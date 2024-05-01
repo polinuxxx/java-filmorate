@@ -1,18 +1,17 @@
-# java-filmorate
+# REST-API Filmorate
+
+## Сервис оценки фильмов
+Позволяет пользователям ставить оценки фильмам, оставлять отзывы и реакции на них, добавлять других пользователей в 
+друзья и просматривать новостную ленту.
+
+## ER-диаграмма
 
 ![ER-diagram](src/main/resources/db/er-diagram.png)
 
-ER-diagram for java-filmorate project.
-
-## description
-Java-filmorate application allows users to rate films, 
-leave reviews and give feedback on them, 
-friend members and watch news feed
-
-## team
-### team leader :muscle:
+## Команда
+### тимлид :muscle:
 @polinuxxx Казичкина Полина
-### developers :man_technologist:
+### разработчики :man_technologist:
 @yelgazin Елгазин Максим
 
 @PavelIgK Кистенев Павел
@@ -32,26 +31,9 @@ friend members and watch news feed
 - [x] https://github.com/polinuxxx/java-filmorate/issues/33 @romilMasnaviev
 - [x] https://github.com/polinuxxx/java-filmorate/issues/34 @PavelIgK
 
-## query examples
-### getting film likes
-```sql
-SELECT COUNT(user_id)
-  FROM likes
-  WHERE film_id = :id;
-```
-### getting user friends
-```sql
-SELECT friend_id
-  FROM friends
-  WHERE user_id = :id;
-```
-### getting most popular films
-```sql
-SELECT film_id,
-       COUNT(user_id) AS likes
-  FROM likes
-  GROUP BY film_id
-  ORDER BY likes DESC
-  LIMIT :count;
-```
-
+## Технологический стек
+![java](https://img.shields.io/badge/java-%23ed8b00.svg?logo=openjdk&logoColor=white&style=flat)
+![spring](https://img.shields.io/badge/spring-%236db33f.svg?logo=spring&logoColor=white&style=flat)
+![maven](https://img.shields.io/badge/Apache%20Maven-C71A36?style=flat&logo=Apache%20Maven&logoColor=white)
+![postgres](https://img.shields.io/badge/postgres-%23336791.svg?logo=postgresql&logoColor=white&style=flat)
+![postman](https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=postman&logoColor=white)
